@@ -4,11 +4,11 @@ RUNS = 1
 
 
 bootstrap_servers = ['localhost:9092']
-topicName = 'cdc_test_topic'
+topicName = 'cdc_test_topics'
 producer = KafkaProducer(bootstrap_servers = bootstrap_servers)
 # Asynchronous by default
 for _ in range(RUNS):
-    future = producer.send('cdc_test_topic', b"""
+    future = producer.send(topicName, b"""
         {"schema":{
             "type":"struct",
             "fields":[
