@@ -98,6 +98,7 @@ def read_kafka_stream(spark_session:SparkSession , kafka_bootstrap_server:str , 
         .option("subscribe", topic_name)
         .option("startingOffsets", starting_offset)
         .option("failOnDataLoss","false")
+        .option('minOffsetsPerTrigger',60000)##60000 offset approximately to 1MB
         .load()
     )
     return df
@@ -187,11 +188,12 @@ if __name__ == '__main__':
                                                                 )
                                             )])
 
-    #reading kafka stream
+    # #reading kafka stream
     df = read_kafka_stream(spark , 'localhost:9092', 'cdc_test_topics' , 'latest')
     df = df.withColumn('value', from_json(col('value').cast('string'), cdc_schema)).select('value','timestamp')
     
-    ##Writing the stream to the delta lake
-    # df.writeStream.format('console').start().awaitTermination()
-    df.writeStream.format("delta").outputMode("append").option("checkpointLocation", "s3a://test/checkpoint/").start("s3a://test/").awaitTermination()
+    # ##Writing the stream to the delta lake
+    # df.coalesce(1).writeStream.format('console').outputMode("append").start().awaitTermination()
+    df.coalesce(1).writeStream.format("delta").outputMode("append").option("checkpointLocation", "s3a://test/checkpoint/").start("s3a://test/").awaitTermination()
+  
     
