@@ -1,6 +1,6 @@
 from kafka import KafkaProducer
 from kafka.errors import KafkaError
-RUNS = 1000000
+RUNS = 100000
 
 
 bootstrap_servers = ['localhost:9092']
