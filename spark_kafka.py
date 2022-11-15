@@ -1,4 +1,4 @@
-from config import sourceBucket,kafka_server,topic_name,spark_config,hadoop_config,cdc_schema
+from config import sourceBucket,kafka_server,topic_name,spark_config,hadoop_config,cdc_schema,table_name
 from pyspark.sql import SparkSession,DataFrame
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
@@ -6,12 +6,9 @@ from pyspark.sql.functions import udf
 from pyspark.sql.functions import col,from_json
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import lit
+from pyspark import StorageLevel
 from typing import Dict,Optional
-
-
-
-
-
+from delta import DeltaTable
 def get_spark_session(app_name:str , master_name:str, config:Optional[Dict] = {}, hadoop_config:Optional[Dict] = {}) -> SparkSession:
     """
     Start the spark session.
@@ -84,8 +81,8 @@ def read_kafka_stream(spark_session:SparkSession , kafka_bootstrap_server:str , 
         .option("subscribe", topic_name)
         .option("startingOffsets", starting_offset)
         .option("failOnDataLoss","false")
-        .option('minOffsetsPerTrigger',60000)##60000 offset approximate to 1MB
-        .option('maxTriggerDelay','3m')## The trigger can be delayed maximum by 3 minutes
+        .option('minOffsetsPerTrigger',60000) ##60000 offset approximate to 1MB
+        .option('maxTriggerDelay','1m')## The trigger can be delayed maximum by 3 minutes
         .load()
     )
     return df
@@ -98,10 +95,19 @@ if __name__ == '__main__':
     
     # #reading kafka stream
     df = read_kafka_stream(spark , kafka_server, topic_name, 'latest')
-    df = df.withColumn('value', from_json(col('value').cast('string'), cdc_schema)).select('value','timestamp')
+    df = df.withColumn('value', from_json(col('value').cast('string'), cdc_schema)).dropna(subset = 'value').select('value','timestamp')
     
-    # ##Writing the stream to the delta lake
-    # df.coalesce(1).writeStream.format('console').outputMode("append").start().awaitTermination()
-    df.coalesce(1).writeStream.format("delta").outputMode("append").option("checkpointLocation", "s3a://{}/checkpoint/".format(sourceBucket)).start("s3a://{}/".format(sourceBucket)).awaitTermination()
+    ## Create the delta table if not exists. This will create the delta table only once.
+    deltaTable = DeltaTable.createIfNotExists(spark) \
+        .tableName(table_name) \
+        .addColumns(df.schema) \
+        .location("s3a://{}/{}".format(sourceBucket,table_name)) \
+        .execute()
+    
+    # # ##Writing the stream to the delta lake
+    df.coalesce(1).writeStream.format("delta") \
+        .outputMode("append") \
+        .option("checkpointLocation", "s3a://{}/{}/_checkpoint/".format(sourceBucket,table_name)) \
+        .toTable(tableName = table_name).awaitTermination()
     
     
