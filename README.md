@@ -2,6 +2,11 @@
 
 ## To run the spark streaming job:
 
+### Spark and Hadoop Version:
+<p> Spark-3.3.1 and Hadoop3 </p>
+
+
+
 ```console
 
 export S3USER=<S3User>
