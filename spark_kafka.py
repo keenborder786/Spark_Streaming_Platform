@@ -6,7 +6,7 @@ from pyspark.sql.functions import udf
 from pyspark.sql.functions import col,from_json
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import lit
-from pyspark import StorageLevel
+from pyspark.storagelevel import StorageLevel
 from typing import Dict,Optional
 from delta import DeltaTable
 def get_spark_session(app_name:str , master_name:str, config:Optional[Dict] = {}, hadoop_config:Optional[Dict] = {}) -> SparkSession:
@@ -105,7 +105,7 @@ if __name__ == '__main__':
         .execute()
     
     # # ##Writing the stream to the delta lake
-    df.coalesce(1).writeStream.format("delta") \
+    df.persist(StorageLevel.MEMORY_AND_DISK_DESER).coalesce(1).writeStream.format("delta") \
         .outputMode("append") \
         .option("checkpointLocation", "s3a://{}/{}/_checkpoint/".format(sourceBucket,table_name)) \
         .toTable(tableName = table_name).awaitTermination()
