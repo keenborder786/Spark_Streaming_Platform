@@ -1,5 +1,5 @@
 import os
-from pyspark.sql.types import IntegerType, StringType, StructField, StructType,ArrayType,BooleanType
+from pyspark.sql.types import DataType,IntegerType, StringType, StructField, StructType,ArrayType,BooleanType,LongType,BinaryType,AtomicType,NullType
 
 s3accessKeyAws = os.environ['S3USER']
 s3secretKeyAws = os.environ['S3Password']
@@ -58,11 +58,11 @@ cdc_schema = StructType([StructField('schema',StructType([
                                                                 ]
                                                             )
                                         ),
-                            StructField('payload',StructType([StructField('before',IntegerType()),
+                        StructField('payload',StructType([StructField('before',IntegerType()),
                                                               StructField('after',StructType([
                                                                                             StructField('id',StructType([
                                                                                                             StructField('value',IntegerType()),
-                                                                                                            StructField('set',StringType())   
+                                                                                                            StructField('set',BooleanType())   
                                                                                                                         ]
                                                                                                                         )
                                                                                                         ),
@@ -71,8 +71,8 @@ cdc_schema = StructType([StructField('schema',StructType([
                                                                                             StructField('created',StringType()),
                                                                                             StructField('creator_type',StringType()),
                                                                                             StructField('creator',StructType([
-                                                                                                            StructField('value',IntegerType()),
-                                                                                                            StructField('set',StringType())   
+                                                                                                            StructField('value',StringType()),
+                                                                                                            StructField('set',BooleanType())   
                                                                                                                         ]
                                                                                                                         )
                                                                                                         ),
@@ -85,7 +85,7 @@ cdc_schema = StructType([StructField('schema',StructType([
                                                                                             StructField('version',StringType()),
                                                                                             StructField('connector',StringType()),
                                                                                             StructField('name',StringType()),
-                                                                                            StructField('ts_ms',IntegerType()),
+                                                                                            StructField('ts_ms',LongType()),
                                                                                             StructField('snapshot',StringType()),
                                                                                             StructField('db',StringType()),
                                                                                             StructField('sequence',StringType()),
@@ -97,8 +97,55 @@ cdc_schema = StructType([StructField('schema',StructType([
                                                                                             ])
                                                                             ),
                                                                 StructField('op',StringType()),
-                                                                StructField('ts_ms',IntegerType()),
-                                                                StructField('transaction',IntegerType())
+                                                                StructField('ts_ms',LongType()),
+                                                                StructField('transaction',StringType())
                                                                 ]
                                                                 )
                                             )])
+
+payload_schema = StructType([StructField('payload',StructType([StructField('before',IntegerType()),
+                                                              StructField('after',StructType([
+                                                                                            StructField('id',StructType([
+                                                                                                            StructField('value',IntegerType()),
+                                                                                                            StructField('set',BooleanType())   
+                                                                                                                        ]
+                                                                                                                        )
+                                                                                                        ),
+                                                                                            StructField('pin',StringType()),
+                                                                                            StructField('status',StringType()),
+                                                                                            StructField('created',StringType()),
+                                                                                            StructField('creator_type',StringType()),
+                                                                                            StructField('creator',StructType([
+                                                                                                            StructField('value',StringType()),
+                                                                                                            StructField('set',BooleanType())   
+                                                                                                                        ]
+                                                                                                                        )
+                                                                                                        ),
+                                                                                            StructField('updated',StringType()),
+                                                                                            StructField('updator_type',StringType()),
+                                                                                            StructField('updator',StringType())
+                                                                                            ])
+                                                                            ),
+                                                                StructField('source',StructType([
+                                                                                            StructField('version',StringType()),
+                                                                                            StructField('connector',StringType()),
+                                                                                            StructField('name',StringType()),
+                                                                                            StructField('ts_ms',LongType()),
+                                                                                            StructField('snapshot',StringType()),
+                                                                                            StructField('db',StringType()),
+                                                                                            StructField('sequence',StringType()),
+                                                                                            StructField('schema',StringType()),
+                                                                                            StructField('table',StringType()),
+                                                                                            StructField('txId',StringType()),
+                                                                                            StructField('lsn',StringType()),
+                                                                                            StructField('xmin',StringType())
+                                                                                            ])
+                                                                            ),
+                                                                StructField('op',StringType()),
+                                                                StructField('ts_ms',LongType()),
+                                                                StructField('transaction',StringType())
+                                                                ]
+                                                                )
+                                            )])
+
+

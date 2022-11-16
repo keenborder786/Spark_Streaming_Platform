@@ -1,5 +1,7 @@
-from config import sourceBucket,kafka_server,topic_name,spark_config,hadoop_config,cdc_schema,table_name
-from pyspark.sql import SparkSession,DataFrame
+import pyspark
+
+from config import sourceBucket,kafka_server,topic_name,spark_config,hadoop_config,table_name,payload_schema,cdc_schema
+from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
 from pyspark.sql.functions import udf
@@ -9,7 +11,12 @@ from pyspark.sql.functions import lit
 from pyspark.storagelevel import StorageLevel
 from typing import Dict,Optional
 from delta import DeltaTable
-def get_spark_session(app_name:str , master_name:str, config:Optional[Dict] = {}, hadoop_config:Optional[Dict] = {}) -> SparkSession:
+
+
+
+def get_spark_session(app_name:str , 
+                    master_name:str, config:Optional[Dict] = {}, 
+                    hadoop_config:Optional[Dict] = {}) -> pyspark.sql.SparkSession:
     """
     Start the spark session.
 
@@ -52,7 +59,10 @@ def get_spark_session(app_name:str , master_name:str, config:Optional[Dict] = {}
         return spark
 
 
-def read_kafka_stream(spark_session:SparkSession , kafka_bootstrap_server:str , topic_name:str , starting_offset:str) -> DataFrame:
+def read_kafka_stream(spark_session:pyspark.sql.SparkSession , 
+                    kafka_bootstrap_server:str , 
+                    topic_name:str , 
+                    starting_offset:str) -> pyspark.sql.DataFrame:
     """
     
     Reads the kafka stream from the given topic and cluster
@@ -81,33 +91,63 @@ def read_kafka_stream(spark_session:SparkSession , kafka_bootstrap_server:str , 
         .option("subscribe", topic_name)
         .option("startingOffsets", starting_offset)
         .option("failOnDataLoss","false")
-        .option('minOffsetsPerTrigger',60000) ##60000 offset approximate to 1MB
-        .option('maxTriggerDelay','1m') ## The trigger can be delayed maximum by 3 minutes
+        # .option('minOffsetsPerTrigger',60000) ##60000 offset approximate to 1MB
+        # .option('maxTriggerDelay','1m') ## The trigger can be delayed maximum by 3 minutes
         .load()
     )
     return df
 
+def batch_function(micro_df:pyspark.sql.types.Row, batch_id:int) -> None:
+  """
+  Parameters:
+
+  ----------------
+
+  micro_df(pyspark.sql.types.Row): The current batch from our streaming data frame
+
+  batch_id(int): The number of batch that we are processing for our pipeline
+
+  This function processes the micro batch for our spark pipeline and writes the data to delta lake.
+  After every 10 batches, we run the optimize command to compact the parquet files created by delta lake
+    
+    
+  Returns
+  -----------  
+    
+  """
+  print(f"Processing micro-batch {batch_id}")
+  if batch_id % 10 == 0:## Compact the files into one file after every 10 batch.
+    deltaTable.optimize().executeCompaction()
+    
+ ## TxnAppID  & TxnVersions makes the delta lake indempotent in order to hold exactly once semantics
+  micro_df.persist(StorageLevel.MEMORY_AND_DISK_DESER).write \
+        .option("txnAppId", "cdc_streaming") \
+        .option("txnVersion", batch_id) \
+        .mode('append') \
+        .format('delta') \
+        .save("s3a://{}/{}".format(sourceBucket,table_name))
+  
 
 if __name__ == '__main__':
     
-    ## Setting up the spark session
+    #Setting up the spark session
     spark = get_spark_session('kafka_delta' , 'local[*]',spark_config,hadoop_config)
     
-    # #reading kafka stream
+    #Reading kafka stream
     df = read_kafka_stream(spark , kafka_server, topic_name, 'latest')
-    df = df.withColumn('value', from_json(col('value').cast('string'), cdc_schema)).dropna(subset = 'value').select('value','timestamp')
-            
-    ## Create the delta table if not exists. This will create the delta table only once.
+    df = df.withColumn('value_json', from_json(col('value').cast('string'), cdc_schema))
+    df = df.withColumn('meta_data',col('value_json.schema')).withColumn('payload',col('value_json.payload')).select('value_json','meta_data','payload','timestamp')
+
+    # # #Create the delta table if not exists. This will create the delta table only once.
     deltaTable = DeltaTable.createIfNotExists(spark) \
         .tableName(table_name) \
         .addColumns(df.schema) \
         .location("s3a://{}/{}".format(sourceBucket,table_name)) \
         .execute()
     
-    # # ##Writing the stream to the delta lake
-    df.coalesce(1).writeStream.format("delta") \
-        .outputMode("append") \
+    # # #Writing the stream to the delta lake
+    df.repartition(1).writeStream.foreachBatch(batch_function) \
         .option("checkpointLocation", "s3a://{}/{}/_checkpoint/".format(sourceBucket,table_name)) \
-        .toTable(tableName = table_name).awaitTermination()
+        .start().awaitTermination()
     
     
