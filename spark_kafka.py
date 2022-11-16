@@ -82,7 +82,7 @@ def read_kafka_stream(spark_session:SparkSession , kafka_bootstrap_server:str , 
         .option("startingOffsets", starting_offset)
         .option("failOnDataLoss","false")
         .option('minOffsetsPerTrigger',60000) ##60000 offset approximate to 1MB
-        .option('maxTriggerDelay','1m')## The trigger can be delayed maximum by 3 minutes
+        .option('maxTriggerDelay','1m') ## The trigger can be delayed maximum by 3 minutes
         .load()
     )
     return df
@@ -96,7 +96,7 @@ if __name__ == '__main__':
     # #reading kafka stream
     df = read_kafka_stream(spark , kafka_server, topic_name, 'latest')
     df = df.withColumn('value', from_json(col('value').cast('string'), cdc_schema)).dropna(subset = 'value').select('value','timestamp')
-    
+            
     ## Create the delta table if not exists. This will create the delta table only once.
     deltaTable = DeltaTable.createIfNotExists(spark) \
         .tableName(table_name) \
@@ -105,7 +105,7 @@ if __name__ == '__main__':
         .execute()
     
     # # ##Writing the stream to the delta lake
-    df.persist(StorageLevel.MEMORY_AND_DISK_DESER).coalesce(1).writeStream.format("delta") \
+    df.coalesce(1).writeStream.format("delta") \
         .outputMode("append") \
         .option("checkpointLocation", "s3a://{}/{}/_checkpoint/".format(sourceBucket,table_name)) \
         .toTable(tableName = table_name).awaitTermination()

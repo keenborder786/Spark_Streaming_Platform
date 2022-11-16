@@ -16,8 +16,8 @@ See the Requirement.txt file
 #### Set Config Variables
 ```console
 
-export S3USER=<S3User>
-export S3Password=<S3password>
+export S3USER=user
+export S3Password=password
 export S3EndPoint=127.0.0.1:9000
 export SourceBucket=test
 export TopicName=cdc_test_topics
@@ -29,7 +29,7 @@ export KafkaServer='localhost:9092'
 
 ```console
 
-docker-compose -f docker_yaml/kafka.yaml -d
+docker-compose -f docker_yaml/kafka.yaml up -d
 
 docker run -d   -p 9000:9000    -p 9090:9090    --name minio    -v ~/minio/data:/data    -e "MINIO_ROOT_USER=user"    -e "MINIO_ROOT_PASSWORD=password"    quay.io/minio/minio server /data --console-address ":9090"
 
