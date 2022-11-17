@@ -22,6 +22,7 @@ export S3EndPoint=127.0.0.1:9000
 export SourceBucket=test
 export TopicName=cdc_test_topics
 export KafkaServer='localhost:9092'
+export TypeJob = 'append'
 
 ```
 #### Start Kafka and MinIO Containers
