@@ -91,8 +91,8 @@ def read_kafka_stream(spark_session:pyspark.sql.SparkSession ,
         .option("subscribe", topic_name)
         .option("startingOffsets", starting_offset)
         .option("failOnDataLoss","false")
-        # .option('minOffsetsPerTrigger',60000) ##60000 offset approximate to 1MB
-        # .option('maxTriggerDelay','1m') ## The trigger can be delayed maximum by 3 minutes
+        .option('minOffsetsPerTrigger',60000) ##60000 offset approximate to 1MB
+        .option('maxTriggerDelay','1m') ## The trigger can be delayed maximum by 3 minutes
         .load()
     )
     return df
