@@ -8,10 +8,10 @@
 ### Python Version:
 Python 3.9.13
 
-### Other Packages:
-
-See the Requirement.txt file
-
+### Setting up conda environment:
+``console
+conda env create -f environment.yml
+```
 
 #### Set Config Variables
 ```console
