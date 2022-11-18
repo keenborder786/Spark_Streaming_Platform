@@ -8,9 +8,7 @@ RUNS = 100000
 bootstrap_servers = ['localhost:9092']
 topicName = 'cdc_test_topics'
 producer = KafkaProducer(bootstrap_servers = bootstrap_servers)
-# Asynchronous by default
-for _ in range(RUNS):
-    future = producer.send(topicName, r"""
+event_json = r"""
         {"schema":{
         "type":"struct",
         "fields":[
@@ -510,4 +508,56 @@ for _ in range(RUNS):
         "transaction":null
     }
 
-}""".encode('utf-8')).get(timeout=30)
+}"""
+
+customer_json = [r"""{
+        "customer_id":1,
+        "country":"Pakistan",
+        "city":"Lahore",
+        "current_balance":23000,
+        "gender":"Male",
+        "eduction":["B.Sc","M.Sc","PHd"]
+}""",
+r"""{
+        "customer_id":2,
+        "country":"Amercia",
+        "city":"Calfornia",
+        "current_balance":32000,
+        "gender":"Female",
+        "eduction":["B.Sc"]
+}""",
+r"""{
+        "customer_id":3,
+        "country":"Israel",
+        "city":null,
+        "current_balance":2444000,
+        "gender":"Female",
+        "eduction":[]
+}""",
+r"""{
+        "customer_id":4,
+        "country":"India",
+        "city":"Delhi",
+        "current_balance":20000000,
+        "gender":"Male",
+        "eduction":["B.Sc"]
+}""",
+r"""{
+        "customer_id":5,
+        "country":"Pakistan",
+        "city":"Lahore",
+        "current_balance":552000,
+        "gender":"Male",
+        "eduction":["B.Sc","M.Sc","PHd"]
+}""",
+r"""{
+        "customer_id":6,
+        "country":"UK",
+        "city":"England",
+        "current_balance":552000,
+        "gender":"Male",
+        "eduction":["B.Sc","M.Sc","PHd"]
+}"""]
+# Asynchronous by default
+for customer_data in customer_json:
+    producer.send(topicName, customer_data.encode('utf-8')).get(timeout=30)

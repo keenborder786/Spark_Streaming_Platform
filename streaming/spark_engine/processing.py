@@ -33,4 +33,12 @@ class SparkProcessing(SparkJob):
         df = df.withColumn('meta_data',col('value_json.schema')).withColumn('payload',col('value_json.payload')).select('value_json','meta_data','payload','timestamp')
         return df
 
+    def customer_process(self ,df:pyspark.sql.DataFrame , schema:pyspark.sql.types.StructType) -> pyspark.sql.DataFrame:
+        df = df.withColumn('value_json', from_json(col('value').cast('string'), schema))
+        df = df.withColumn('customer_id',col('value_json.customer_id')).withColumn('country',col('value_json.country')) \
+            .withColumn('city',col('value_json.city')).withColumn('gender',col('value_json.gender')) \
+            .withColumn('eduction',col('value_json.eduction')).select('customer_id','country','city','gender','eduction')
+        return df
+
+
     
