@@ -151,6 +151,11 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+#pycache files
+.pyc
+
+#repos for pyspark schema.
 pyspark_schema_reps_test
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
