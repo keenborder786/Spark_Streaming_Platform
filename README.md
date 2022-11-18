@@ -37,8 +37,10 @@ Python 3.9.13
 
 
 ### Setting up conda environment:
-``console
+
+```console
 conda env create -f environment.yml
+
 ```
 
 #### Set Config Variables
