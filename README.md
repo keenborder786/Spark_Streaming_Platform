@@ -8,6 +8,34 @@
 ### Python Version:
 Python 3.9.13
 
+### Conda Settings
+
+```yaml
+          conda version : 22.9.0
+    conda-build version : 3.22.0
+         python version : 3.9.13.final.0
+       virtual packages : __linux=5.15.0=0
+                          __glibc=2.35=0
+                          __unix=0=0
+                          __archspec=1=x86_64
+  conda av metadata url : None
+           channel URLs : https://repo.anaconda.com/pkgs/main/linux-64
+                          https://repo.anaconda.com/pkgs/main/noarch
+                          https://repo.anaconda.com/pkgs/free/linux-64
+                          https://repo.anaconda.com/pkgs/free/noarch
+                          https://repo.anaconda.com/pkgs/r/linux-64
+                          https://repo.anaconda.com/pkgs/r/noarch
+                          https://conda.anaconda.org/conda-forge/linux-64
+                          https://conda.anaconda.org/conda-forge/noarch
+                          https://conda.anaconda.org/pypi/linux-64
+                          https://conda.anaconda.org/pypi/noarch
+               platform : linux-64
+             user-agent : conda/22.9.0 requests/2.28.1 CPython/3.9.13 Linux/5.15.0-52-generic ubuntu/22.04.1 glibc/2.35
+             netrc file : None  
+           offline mode : False
+```
+
+
 ### Setting up conda environment:
 ``console
 conda env create -f environment.yml
@@ -39,6 +67,8 @@ docker run -d   -p 9000:9000    -p 9090:9090    --name minio    -v ~/minio/data:
 #### Start Spark Job
 
 
+<p> Download the spark from following link:https://www.apache.org/dyn/closer.lua/spark/spark-3.3.1/spark-3.3.1-bin-hadoop3.tgz </p>
+<p> Navigate to spark-3.3.1-bin-hadoop3 and run the following command </p>
 
 ```console
 
