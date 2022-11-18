@@ -4,8 +4,11 @@
 from streaming.spark_engine import SparkJob
 from pyspark.sql.functions import from_json,col
 import pyspark
+
+
 class SparkProcessing(SparkJob):
     def __init__(self,app_name,master_name,config,hadoop_config):
+        
         super().__init__(app_name,master_name,config,hadoop_config)
     
     def event_processing(self ,df:pyspark.sql.DataFrame , schema:pyspark.sql.types.StructType) -> pyspark.sql.DataFrame:

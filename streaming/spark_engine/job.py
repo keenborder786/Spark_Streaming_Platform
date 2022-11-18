@@ -12,7 +12,8 @@ from pyspark.sql.functions import col,from_json
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import lit
 from typing import Dict,Optional
-from delta import DeltaTable
+from dotenv import load_dotenv
+
 
 
 class SparkJob:
@@ -68,7 +69,8 @@ class SparkJob:
     def read_kafka_stream(self , 
                         kafka_bootstrap_server:str , 
                         topic_name:str , 
-                        starting_offset:str) -> pyspark.sql.DataFrame:
+                        starting_offset:str,
+                        kafka_config:Optional[Dict[str,str]] = {}) -> pyspark.sql.DataFrame:
         """
         
         Reads the kafka stream from the given topic and cluster
@@ -81,24 +83,20 @@ class SparkJob:
 
         starting_offset(str): Should we read the message in the given topic from start or end
 
-        cdcSchema(structtype): The streaming schema in structtype
+        kafka_config(Dict,Optional): The configurations for reading streaming from kafka
 
         Returns:
         ---------------------------
         DataFrame: Structured Spark DataFrame
 
         """
-
-        df = (
-            self.spark_session.readStream.format("kafka")
-            .option("kafka.bootstrap.servers", kafka_bootstrap_server)
-            .option("subscribe", topic_name)
-            .option("startingOffsets", starting_offset)
-            .option("failOnDataLoss","false")
-            .option('minOffsetsPerTrigger',60000) ##60000 offset approximate to 1MB
-            .option('maxTriggerDelay','1m') ## The trigger can be delayed maximum by 3 minutes
-            .load()
-        )
+        
+        df = self.spark_session.readStream.format("kafka").option("kafka.bootstrap.servers", kafka_bootstrap_server) \
+                                                          .option("subscribe", topic_name) \
+                                                          .option("starting_offset",starting_offset)
+        for k,v in kafka_config.items(): df = df.option(k,v) ## Loading the other specific config
+        df = df.load()
+        
         return df
 
 

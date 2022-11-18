@@ -43,18 +43,25 @@ conda env create -f environment.yml
 
 ```
 
-#### Set Config Variables
+#### Set following Config Variables as per your desire and put in an .env file.
 ```console
-
-export S3USER=user
-export S3Password=password
-export S3EndPoint=127.0.0.1:9000
-export SourceBucket=test
-export TopicName=cdc_test_topics
-export KafkaServer='localhost:9092'
-export TypeJob = 'append'
+S3USER='user'
+S3Password='password'
+S3EndPoint='127.0.0.1:9000'
+SourceBucket='test'
+KafkaServer='localhost:9092'
+TopicName='cdc_test_topics'
+KafkaConsumerConfig='{"startingOffsets":"latest","failOnDataLoss":"false","minOffsetsPerTrigger":60000,"maxTriggerDelay":"1m"}'
+TableName='cdc_table'
+TypeJob='append'
+DeltaTableConfig='{"delta.appendOnly":"true"}'
+Source_Schema="{'type':,'fields':''}" 
 
 ```
+<p> KafkaConsumerConfig options can be seen from: https://spark.apache.org/docs/2.1.0/structured-streaming-kafka-integration.html </p>
+<p> DeltaTableConfig options can be seen from: https://docs.delta.io/latest/table-properties.html </p>
+<p> Source_Schema can be generated from StructType.jsonValue() </p>
+
 #### Start Kafka and MinIO Containers
 
 

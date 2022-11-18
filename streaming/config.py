@@ -1,19 +1,20 @@
 import os
-from pyspark.sql.types import IntegerType, StringType, StructField, StructType,ArrayType,BooleanType,LongType,BinaryType,AtomicType,NullType
+import json
+from pyspark.sql.types import *
 
 ## All of the configs needed to run the streaming pipeline
-
 s3accessKeyAws = os.environ['S3USER']
 s3secretKeyAws = os.environ['S3Password']
-connectionTimeOut = os.environ['Timeout']
 s3endPointLoc= os.environ['S3EndPoint']
 sourceBucket = os.environ['SourceBucket']
 kafka_server = os.environ['KafkaServer']
+kafka_config = json.loads(os.environ['KafkaConsumerConfig'])
 topic_name = os.environ['TopicName']
 table_name = os.environ['TableName']
 type_job = os.environ['TypeJob']
-
-spark_config = {"spark.sql.extensions":"io.delta.sql.DeltaSparkSessionExtension",
+delta_table_config = json.loads(os.environ['DeltaTableConfig'])
+cdc_schema = StructType.fromJson(json.loads(os.environ['Source_Schema']))
+spark_config={"spark.sql.extensions":"io.delta.sql.DeltaSparkSessionExtension",
                 "spark.sql.catalog.spark_catalog":"org.apache.spark.sql.delta.catalog.DeltaCatalog",
                 "spark.executor.extraJavaOptions":"-Dcom.amazonaws.services.s3.enableV4=true",
                 "spark.driver.extraJavaOptions":"-Dcom.amazonaws.services.s3.enableV4=true",
@@ -23,91 +24,12 @@ spark_config = {"spark.sql.extensions":"io.delta.sql.DeltaSparkSessionExtension"
                 "spark.databricks.delta.vacuum.parallelDelete.enabled":"true",
                 "spark.databricks.delta.optimize.repartition.enabled":"true"
                 }
-hadoop_config = {"fs.s3a.endpoint":s3endPointLoc,
+hadoop_config={"fs.s3a.endpoint":s3endPointLoc,
                 "fs.s3a.access.key":s3accessKeyAws,
                 "fs.s3a.secret.key":s3secretKeyAws,
-                'spark.hadoop.fs.s3a.aws.credentials.provider':'org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider',
+                "spark.hadoop.fs.s3a.aws.credentials.provider":"org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider",
                 "spark.hadoop.fs.s3a.path.style.access":"true",
                 "com.amazonaws.services.s3.enableV4":"true",
                 "fs.s3a.connection.ssl.enabled":"false",
                 "spark.hadoop.fs.s3a.impl":"org.apache.hadoop.fs.s3a.S3AFileSystem"
                 }
-
-## The possible schemas that we will be using in our pipeline
-## We can store them externally and import into our streaming pipeline.
-cdc_schema = StructType([StructField('schema',StructType([
-                                                            StructField('type',StringType()),
-                                                            StructField('fields',ArrayType(
-                                                                                    StructType([StructField('type',StringType()),
-                                                                                                StructField('fields',ArrayType(
-                                                                                                    StructType([StructField('type',StringType()),
-                                                                                                                StructField('fields',ArrayType(
-                                                                                                                    StructType([StructField('type',StringType()),
-                                                                                                                                StructField('optional',BooleanType()),
-                                                                                                                                StructField('field',StringType())
-                                                                                                                                ])                                       
-                                                                                                                                            )
-                                                                                                                                ),
-                                                                                                                StructField('optional',BooleanType()),
-                                                                                                                StructField('name',StringType()),
-                                                                                                                StructField('field',StringType())])
-                                                                                                                                )
-                                                                                                            ),
-                                                                                                StructField('optional',StringType()),
-                                                                                                StructField('name',StringType()),
-                                                                                                StructField('field',StringType())
-                                                                                                ]
-                                                                                                )
-                                                                                            )
-                                                                        ),
-                                                            StructField('optional',BooleanType()),
-                                                            StructField('name',StringType())
-                                                                ]
-                                                            )
-                                        ),
-                        StructField('payload',StructType([StructField('before',IntegerType()),
-                                                              StructField('after',StructType([
-                                                                                            StructField('id',StructType([
-                                                                                                            StructField('value',IntegerType()),
-                                                                                                            StructField('set',BooleanType())   
-                                                                                                                        ]
-                                                                                                                        )
-                                                                                                        ),
-                                                                                            StructField('pin',StringType()),
-                                                                                            StructField('status',StringType()),
-                                                                                            StructField('created',StringType()),
-                                                                                            StructField('creator_type',StringType()),
-                                                                                            StructField('creator',StructType([
-                                                                                                            StructField('value',StringType()),
-                                                                                                            StructField('set',BooleanType())   
-                                                                                                                        ]
-                                                                                                                        )
-                                                                                                        ),
-                                                                                            StructField('updated',StringType()),
-                                                                                            StructField('updator_type',StringType()),
-                                                                                            StructField('updator',StringType())
-                                                                                            ])
-                                                                            ),
-                                                                StructField('source',StructType([
-                                                                                            StructField('version',StringType()),
-                                                                                            StructField('connector',StringType()),
-                                                                                            StructField('name',StringType()),
-                                                                                            StructField('ts_ms',LongType()),
-                                                                                            StructField('snapshot',StringType()),
-                                                                                            StructField('db',StringType()),
-                                                                                            StructField('sequence',StringType()),
-                                                                                            StructField('schema',StringType()),
-                                                                                            StructField('table',StringType()),
-                                                                                            StructField('txId',StringType()),
-                                                                                            StructField('lsn',StringType()),
-                                                                                            StructField('xmin',StringType())
-                                                                                            ])
-                                                                            ),
-                                                                StructField('op',StringType()),
-                                                                StructField('ts_ms',LongType()),
-                                                                StructField('transaction',StringType())
-                                                                ]
-                                                                )
-                                            )])
-
-customer_schema = None

@@ -5,18 +5,22 @@
     ## Querying Table from Specific Timestamp
 
 import pyspark
-from pyspark.sql import DataFrame
-from streaming.config import spark_config,hadoop_config
-from delta import DeltaTable,tables
-
+from delta import DeltaTable
+from typing import Dict
 class DeltaLakeInteraction:
 
-    def __init__(self,spark , sourcebucket,table_name):
+    def __init__(self,spark , sourcebucket, table_name):
         self.spark_session = spark
         self.bucket = sourcebucket
         self.table_name = table_name
     
-    def create_delta_table(self ,schema,*partition_col ,**table_properties):    
+    def create_delta_table(self ,schema:pyspark.sql.types.StructType, table_properties:Dict ,*partition_col):
+        """
+        
+        
+        
+        
+        """  
         
         delta_table = DeltaTable.createIfNotExists(self.spark_session) \
             .tableName(self.table_name) \
@@ -24,7 +28,7 @@ class DeltaLakeInteraction:
             .location("s3a://{}/{}".format(self.bucket,self.table_name))
         
         for key,val in table_properties.items():
-            delta_table = delta_table.property('delta.'+key,val)
+            delta_table = delta_table.property(key,val)
        
         if partition_col == ():
             delta_table = delta_table.execute()

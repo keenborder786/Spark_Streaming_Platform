@@ -1,4 +1,4 @@
-name: spark_streaming_2
+name: spark_streaming
 channels:
   - defaults
   - conda-forge

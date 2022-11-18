@@ -1,16 +1,22 @@
 ## This is the main module which will run our streaming pipeline according to the configuration provided in config.py
+## loading from all env variables
+
 
 import pyspark
+from dotenv import load_dotenv,find_dotenv
+load_dotenv(find_dotenv())
 from pyspark.storagelevel import StorageLevel
 from streaming.spark_engine import SparkProcessing
 from streaming.deltalake_engine import DeltaLakeInteraction
 from streaming.config import (spark_config,
+                    delta_table_config,
                     hadoop_config,
                     kafka_server,
                     topic_name,
                     sourceBucket,
                     table_name,
                     cdc_schema,
+                    kafka_config,
                     type_job)
 
 
@@ -33,13 +39,13 @@ def batch_function_append(micro_df:pyspark.sql.types.Row, batch_id:int) -> None:
     -----------  
         
     """
-    print(f"Processing micro-batch {batch_id}")
+    print(f"===========Processing micro-batch {batch_id}===========")
     if batch_id % 100 == 0:## Compact the files into one file after every 10 batch & delete the files greater than the retention period not needed by delta lake 
         deltatable.optimize().executeCompaction()
         deltatable.vacuum()
     ## TxnAppID  & TxnVersions makes the delta lake indempotent in order to hold exactly once semantics
     micro_df.persist(StorageLevel.MEMORY_AND_DISK_DESER).write \
-            .option("txnAppId", "cdc_streaming") \
+            .option("txnAppId", table_name) \
             .option("txnVersion", batch_id) \
             .mode('append') \
             .format('delta') \
@@ -49,21 +55,19 @@ def batch_function_upsert():## TO-DO
     pass
 
 if __name__ == '__main__':
-
     #Setting up the spark session
     spark_processor = SparkProcessing('kafka_delta' , 'local[*]',spark_config,hadoop_config)
 
     #Reading kafka stream
-    df = spark_processor.read_kafka_stream(kafka_server, topic_name, 'latest')
+    df = spark_processor.read_kafka_stream(kafka_server, topic_name, 'latest',kafka_config)
     df = spark_processor.event_processing(df , cdc_schema) ## What type of processing do we need to do?
-
+    ### Business-wise processing can come here!
 
     ## Create the delta table if not exists. This will create the delta table only once.
     ## Remeber this will create the  desired delta table according to the desired table configuration.
     ## This does not need to be here eventually since this is not part of the main streaming pipeline
     deltalake_instance = DeltaLakeInteraction(spark_processor.spark_session, sourceBucket , table_name)
-    deltatable = deltalake_instance.create_delta_table(df.schema, enableChangeDataFeed = 'true'
-                                                                  ,appendOnly = 'true' , deletedFileRetentionDuration = 'interval 7 days')
+    deltatable = deltalake_instance.create_delta_table(df.schema, delta_table_config)
     
     ## Writing the stream to the delta lake and decide whether to append only or upsert
     if type_job == 'append':
