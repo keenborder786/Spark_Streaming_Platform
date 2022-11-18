@@ -4,6 +4,8 @@ channels:
   - conda-forge
   - pypi
 dependencies:
+  - _libgcc_mutex=0.1
+  - _openmp_mutex=5.1
   - asttokens=2.0.5
   - backcall=0.2.0
   - ca-certificates=2022.10.11
@@ -19,7 +21,10 @@ dependencies:
   - jupyter_core=4.11.1
   - ld_impl_linux-64=2.38
   - libffi=3.3
+  - libgcc-ng=11.2.0
+  - libgomp=11.2.0
   - libsodium=1.0.18
+  - libstdcxx-ng=11.2.0
   - matplotlib-inline=0.1.6
   - ncurses=6.3
   - nest-asyncio=1.5.5
@@ -62,7 +67,8 @@ dependencies:
     - pandas==1.5.1
     - py4j==0.10.9.5
     - pyspark==3.3.1
+    - python-dotenv==0.21.0
     - pytz==2022.6
     - urllib3==1.26.12
     - zipp==3.10.0
-
+prefix: /home/mohtashimkhan/anaconda3/envs/spark_streaming
