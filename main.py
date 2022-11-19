@@ -85,10 +85,8 @@ if __name__ == '__main__':
 
     #Reading kafka stream
     df = spark_processor.read_kafka_stream(kafka_server, topic_name, 'latest',kafka_config)
-    # df = spark_processor.event_processing(df , cdc_schema) ## What type of processing do we need to do?
+    df = spark_processor.event_processing(df , cdc_schema) ## What type of processing do we need to do?
     ### Business-wise processing can come here!
-    df = spark_processor.customer_process(df , cdc_schema)
-
 
     ## Create the delta table if not exists. This will create the delta table only once.
     ## Remeber this will create the  desired delta table according to the desired table configuration.
