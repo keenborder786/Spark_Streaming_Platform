@@ -55,7 +55,7 @@ KafkaConsumerConfig='{"startingOffsets":"latest","failOnDataLoss":"false","minOf
 TableName='cdc_table'
 TypeJob='append'
 DeltaTableConfig='{"delta.appendOnly":"true"}'
-Source_Schema="{'type':,'fields':''}" 
+Source_Schema='{"type":"","fields":""}' 
 
 ```
 <p> KafkaConsumerConfig options can be seen from: https://spark.apache.org/docs/2.1.0/structured-streaming-kafka-integration.html </p>
