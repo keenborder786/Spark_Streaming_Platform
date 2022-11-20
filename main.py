@@ -91,6 +91,7 @@ if __name__ == '__main__':
     ## Create the delta table if not exists. This will create the delta table only once.
     ## Remeber this will create the  desired delta table according to the desired table configuration.
     ## This does not need to be here eventually since this is not part of the main streaming pipeline
+    
     deltalake_instance = DeltaLakeInteraction(spark_processor.spark_session, sourceBucket , table_name)
     deltatable = deltalake_instance.create_delta_table(df.schema, delta_table_config)
     ## Writing the stream to the delta lake and decide whether to append only or upsert
