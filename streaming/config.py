@@ -12,8 +12,10 @@ kafka_config = json.loads(os.environ['KafkaConsumerConfig'])
 topic_name = os.environ['TopicName']
 table_name = os.environ['TableName']
 type_job = os.environ['TypeJob']
-delta_table_config = json.loads(os.environ['DeltaTableConfig'])
+customer_table_config = json.loads(os.environ['CustomerTableConfig'])
+raw_event_table_config = json.loads(os.environ['RawEventTableConfig'])
 cdc_schema = StructType.fromJson(json.loads(os.environ['SourceSchema']))
+
 spark_config={"spark.sql.extensions":"io.delta.sql.DeltaSparkSessionExtension",
                 "spark.sql.catalog.spark_catalog":"org.apache.spark.sql.delta.catalog.DeltaCatalog",
                 "spark.executor.extraJavaOptions":"-Dcom.amazonaws.services.s3.enableV4=true",

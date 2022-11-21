@@ -16,8 +16,7 @@ RUN apt update
 RUN apt install -y default-jdk
 RUN wget https://downloads.apache.org/spark/spark-3.3.1/spark-3.3.1-bin-hadoop3.tgz   
 RUN tar -xzf spark-3.3.1-bin-hadoop3.tgz
-RUN mkdir /opt/spark
-RUN mv spark-3.3.1-bin-hadoop3.tgz /opt/spark
+RUN mv spark-3.3.1-bin-hadoop3 /opt/spark
 RUN export SPARK_HOME=/opt/spark
 RUN export PATH=$PATH:$SPARK_HOME/bin
 
@@ -34,7 +33,6 @@ RUN mkdir /opt/poc_kafka_delta
 WORKDIR /opt/poc_kafka_delta
 COPY streaming/ streaming/
 COPY main.py .
-COPY hello.py .
 COPY entrypoint.sh ./
 
 ## Execute the final shell script to run our job

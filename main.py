@@ -10,22 +10,22 @@ from delta.tables import DeltaTable
 from streaming.spark_engine import SparkProcessing
 from streaming.deltalake_engine import DeltaLakeInteraction
 from streaming.config import (spark_config,
-                    delta_table_config,
                     hadoop_config,
                     kafka_server,
                     topic_name,
                     sourceBucket,
-                    table_name,
                     cdc_schema,
                     kafka_config,
-                    type_job)
+                    customer_table_config,
+                    raw_event_table_config)
 
 
-def batch_function_append(micro_df:pyspark.sql.types.Row, batch_id:int) -> None:
+def batch_function_raw_events(micro_df:pyspark.sql.types.Row, batch_id:int) -> None:
     """
 
-    This function inserts every streaming micro_df to the delta table.
-    After every 10 batches, we run the optimize command to compact the parquet files created by delta lake
+    This functions insert every message consisting of CDC payload as it on Delta Lake. Making sure
+    that each message is only written once.
+    After every 100 batches, we run the optimize command to compact the parquet files created by delta lake
     
 
     Parameters:
@@ -39,22 +39,21 @@ def batch_function_append(micro_df:pyspark.sql.types.Row, batch_id:int) -> None:
     -----------  
         
     """
-    print(f"===========Processing micro-batch {batch_id}===========")
+    print(f"===========Processing micro-batch {batch_id} for Raw Events===========")
     if batch_id % 100 == 0:## Compact the files into one file after every 10 batch & delete the files greater than the retention period not needed by delta lake 
-        deltatable.optimize().executeCompaction()
-        deltatable.vacuum()
-    ## TxnAppID  & TxnVersions makes the delta lake indempotent in order to hold exactly once semantics
-    micro_df.persist(StorageLevel.MEMORY_AND_DISK_DESER).write \
-            .option("txnAppId", table_name) \
-            .option("txnVersion", batch_id) \
-            .mode('append') \
-            .format('delta') \
-            .save("s3a://{}/{}".format(sourceBucket,table_name))
+        raw_events_table.optimize().executeCompaction()
     
-def batch_function_upsert(micro_df:pyspark.sql.Row, batch_id:int):
+    ## If the message is already written to raw events table then don't write the message.
+    raw_events_table.alias('events') \
+    .merge(micro_df.alias('updates').persist(StorageLevel.MEMORY_AND_DISK_DESER) , "events.unique_message_id = updates.unique_message_id") \
+    .whenNotMatchedInsertAll().execute()
+
+    
+    
+def batch_function_customer_processing(micro_df:pyspark.sql.DataFrame, batch_id:int):
     """
     This function either inserts the micro_df to delta table otherwise update the data from micro_df
-    After every 10 batches, we run the optimize command to compact the parquet files created by delta lake
+    After every 100 batches, we run the optimize command to compact the parquet files created by delta lake
     
     Parameters:
     ----------------
@@ -67,16 +66,17 @@ def batch_function_upsert(micro_df:pyspark.sql.Row, batch_id:int):
     -----------  
     
     """
-    print(f"===========Processing micro-batch {batch_id}===========")
+    print(f"===========Processing micro-batch {batch_id} for Customer Table===========")
     if batch_id % 100 == 0:## Compact the files into one file after every 10 batch & delete the files greater than the retention period not needed by delta lake 
-        deltatable.optimize().executeCompaction()
-        deltatable.vacuum()
-    deltatable \
+        customer_table.optimize().executeCompaction()
+    
+    customer_table \
     .alias("main_table") \
-    .merge(micro_df.alias("update_table").persist(StorageLevel.MEMORY_AND_DISK_DESER), "main_table.customer_id = update_table.customer_id") \
+    .merge(micro_df.alias("update_table").persist(StorageLevel.MEMORY_AND_DISK_DESER), "main_table.id = update_table.id") \
     .whenMatchedUpdateAll() \
     .whenNotMatchedInsertAll() \
     .execute()
+
 
 if __name__ == '__main__':
 
@@ -85,22 +85,25 @@ if __name__ == '__main__':
 
     #Reading kafka stream
     df = spark_processor.read_kafka_stream(kafka_server, topic_name, 'latest',kafka_config)
-    df = spark_processor.event_processing(df , cdc_schema) ## What type of processing do we need to do?
-    ### Business-wise processing can come here!
-
-    ## Create the delta table if not exists. This will create the delta table only once.
-    ## Remeber this will create the  desired delta table according to the desired table configuration.
-    ## This does not need to be here eventually since this is not part of the main streaming pipeline
     
-    deltalake_instance = DeltaLakeInteraction(spark_processor.spark_session, sourceBucket , table_name)
-    deltatable = deltalake_instance.create_delta_table(df.schema, delta_table_config)
-    ## Writing the stream to the delta lake and decide whether to append only or upsert
-    if type_job == 'append':
-        df.repartition(1).writeStream.foreachBatch(batch_function_append) \
-            .option("checkpointLocation", "s3a://{}/{}/_checkpoint/".format(sourceBucket,table_name)) \
-            .start().awaitTermination()
-    else:
-        # df.repartition(1).writeStream.format('console').start().awaitTermination()
-        df.repartition(1).writeStream.foreachBatch(batch_function_upsert) \
-            .option("checkpointLocation", "s3a://{}/{}/_checkpoint/".format(sourceBucket,table_name)) \
-            .start().awaitTermination()
+
+    ## Processing the raw_events coming from kafka 
+    raw_events = spark_processor.event_processing(df , cdc_schema)
+    raw_events_deltalake_instance = DeltaLakeInteraction(spark_processor.spark_session, sourceBucket , 'FactRawCDC')
+    raw_events_table = raw_events_deltalake_instance.create_delta_table(raw_events.schema, raw_event_table_config)
+
+    ### Processing the customer data from cdc payload!
+    customer_update = spark_processor.customer_processing(raw_events)
+    customer_table_deltalake_instance = DeltaLakeInteraction(spark_processor.spark_session, sourceBucket , 'DimCustomer')
+    customer_table = customer_table_deltalake_instance.create_delta_table(customer_update.schema, customer_table_config)
+
+    ### Writing the raw_events on delta lake and ensuring each message is only written once by using a unique identifier
+    raw_event_streaming = raw_events.repartition(1).writeStream.foreachBatch(batch_function_raw_events).outputMode("append") \
+        .option("checkpointLocation", "s3a://{}/{}/_checkpoint/".format(sourceBucket,'FactRawCDC')) \
+        .start()
+    
+    
+    ### Updating the customer table data on delta lake
+    customer_table_streaming = customer_update.repartition(1).writeStream.foreachBatch(batch_function_customer_processing).outputMode("update") \
+        .option("checkpointLocation", "s3a://{}/{}/_checkpoint/".format(sourceBucket,'DimCustomer')) \
+        .start().awaitTermination()

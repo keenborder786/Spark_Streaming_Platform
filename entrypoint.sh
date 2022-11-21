@@ -10,4 +10,4 @@ conda activate spark_streaming
 set -euo pipefail
 
 # exec the final command:
-exec python hello.py
+exec /opt/spark/spark-3.3.1-bin-hadoop3/bin/spark-shell

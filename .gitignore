@@ -157,6 +157,9 @@ cython_debug/
 
 #repos for pyspark schema.
 pyspark_schema_reps_test
+
+#Any secrets used
+secrets
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
 #  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
