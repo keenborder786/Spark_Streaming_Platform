@@ -30,7 +30,7 @@ Source_Schema='{"type":"","fields":""}'
 
 ```
 <p> KafkaConsumerConfig options can be seen from: https://spark.apache.org/docs/2.1.0/structured-streaming-kafka-integration.html </p>
-<p> DeltaTableConfig options can be seen from: https://docs.delta.io/latest/table-properties.html </p>
+<p> DeltaTableConfig (for Raw and Customer Tables) options can be seen from: https://docs.delta.io/latest/table-properties.html </p>
 <p> Source_Schema can be generated from StructType.jsonValue() </p>
 
 #### Step:2 Build the docker image for spark_job
