@@ -1,15 +1,11 @@
-import json
+
 
 
 from kafka import KafkaProducer
-from kafka.errors import KafkaError
-RUNS = 100000
-
 bootstrap_servers = ['localhost:9092']
 topicName = 'cdc_test_topics'
 producer = KafkaProducer(bootstrap_servers = bootstrap_servers)
 # Asynchronous by default
-
 future = producer.send(topicName, r"""
     {"schema":{
     "type":"struct",

@@ -14,6 +14,7 @@ services:
     environment:
       KAFKA_ADVERTISED_HOST_NAME: localhost
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CREATE_TOPICS: "cdc_test_topics:1:1"
   minio:
     image: quay.io/minio/minio
     container_name: minio
@@ -29,7 +30,11 @@ services:
       - minio_user
       - minio_password
     command: server /data --console-address ":9090"
-
+  spark:
+    image: spark_job:2.0
+    container_name: spark
+    env_file:
+      - .env
 
 secrets:
   minio_user:

@@ -489,7 +489,7 @@
     "sequence":"[\"0:0::0:0\",\"3:6::0:0\"]",
     "schema":"public",
     "table":"customer",
-    "txId":"",
+    "txId":"143421",
     "lsn":"3:6::0:0",
     "xmin":null
 },
