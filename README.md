@@ -43,18 +43,25 @@ conda env create -f environment.yml
 
 ```
 
-#### Set Config Variables
+#### Set following Config Variables as per your desire and put in an .env file.
 ```console
-
-export S3USER=user
-export S3Password=password
-export S3EndPoint=127.0.0.1:9000
-export SourceBucket=test
-export TopicName=cdc_test_topics
-export KafkaServer='localhost:9092'
-export TypeJob = 'append'
+S3USER='user'
+S3Password='password'
+S3EndPoint='127.0.0.1:9000'
+SourceBucket='test'
+KafkaServer='localhost:9092'
+TopicName='cdc_test_topics'
+KafkaConsumerConfig='{"startingOffsets":"latest","failOnDataLoss":"false","minOffsetsPerTrigger":60000,"maxTriggerDelay":"1m"}'
+TableName='cdc_table'
+TypeJob='append'
+DeltaTableConfig='{"delta.appendOnly":"true"}'
+Source_Schema='{"type":"","fields":""}' 
 
 ```
+<p> KafkaConsumerConfig options can be seen from: https://spark.apache.org/docs/2.1.0/structured-streaming-kafka-integration.html </p>
+<p> DeltaTableConfig options can be seen from: https://docs.delta.io/latest/table-properties.html </p>
+<p> Source_Schema can be generated from StructType.jsonValue() </p>
+
 #### Start Kafka and MinIO Containers
 
 
@@ -65,7 +72,7 @@ docker-compose -f docker_yaml/kafka.yaml up -d
 docker run -d   -p 9000:9000    -p 9090:9090    --name minio    -v ~/minio/data:/data    -e "MINIO_ROOT_USER=user"    -e "MINIO_ROOT_PASSWORD=password"    quay.io/minio/minio server /data --console-address ":9090"
 
 ```
-
+d
 #### Start Spark Job
 
 

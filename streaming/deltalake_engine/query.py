@@ -5,18 +5,33 @@
     ## Querying Table from Specific Timestamp
 
 import pyspark
-from pyspark.sql import DataFrame
-from streaming.config import spark_config,hadoop_config
-from delta import DeltaTable,tables
-
+import delta
+from delta import DeltaTable
+from typing import Dict
 class DeltaLakeInteraction:
 
-    def __init__(self,spark , sourcebucket,table_name):
+    def __init__(self,spark , sourcebucket, table_name):
         self.spark_session = spark
         self.bucket = sourcebucket
         self.table_name = table_name
     
-    def create_delta_table(self ,schema,*partition_col ,**table_properties):    
+    def create_delta_table(self ,schema:pyspark.sql.types.StructType, table_properties:Dict ,*partition_col) -> delta.tables.DeltaTableBuilder:
+        """
+        This will create a delta table on the delta lake if it does not exist given the configuration.
+
+        Parameters:
+        --------------------------------------------------------
+        schema(StructType): The schema which is being used to create the delta table
+
+        table_properties(Dict): The delta table properties that you would like to use
+
+        partition_col(list): The columns which you need to use for partitioning your delta table
+        
+        Returns
+        ---------------------------------------------------------
+        delta.tables.DeltaTableBuilder
+    
+        """  
         
         delta_table = DeltaTable.createIfNotExists(self.spark_session) \
             .tableName(self.table_name) \
@@ -24,7 +39,7 @@ class DeltaLakeInteraction:
             .location("s3a://{}/{}".format(self.bucket,self.table_name))
         
         for key,val in table_properties.items():
-            delta_table = delta_table.property('delta.'+key,val)
+            delta_table = delta_table.property(key,val)
        
         if partition_col == ():
             delta_table = delta_table.execute()
@@ -33,22 +48,30 @@ class DeltaLakeInteraction:
 
         return delta_table
 
-    def restore_table_version(self ,version_number:int):
+    def restore_table_version(self ,version_number:int) -> None:
         """
+
+        Restore the DeltaTable to an older version of the table specified by version number.
+        
         Parameters:
         ----------------------------
         version_number: The version_number to which you want to restore the table to
 
-        Restore the DeltaTable to an older version of the table specified by version number.
-        
+
+        Returns
+        ------------------------------
+        None
+
         """
         deltaTable = DeltaTable.forPath(self.spark_session, "s3a://{}/{}".format(self.bucket,self.table_name))
         deltaTable.restoreToVersion(version_number)
         print('Table has been restored to the following version {}'.format(version_number))
 
 
-    def restore_table_version(self , time_period:str):
+    def restore_table_time_period(self , time_period:str) -> None:
         """
+        Restore the DeltaTable to an snapshot of older timestamp.
+
         Parameters:
         ----------------------------
         time_period: The time_period to which you want to restore the table to
@@ -103,5 +126,4 @@ class DeltaLakeInteraction:
 
         df = self.spark_session.read.format('delta').option("versionAsOf", version).load("s3a://{}/{}".format(self.bucket,self.table_name))
         return df
-
 
