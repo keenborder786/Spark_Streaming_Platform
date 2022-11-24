@@ -1,14 +1,5 @@
 # poc_kafka_delta
 
-## To run the spark streaming job:
-
-### Spark and Hadoop Version:
-<p> Spark-3.3.1 and Hadoop3 </p>
-
-### Python Version:
-Python 3.9.13
-
-
 ### How to test run the pipeline?
 
 #### Step:0 Create minio credentials:
@@ -16,7 +7,7 @@ Python 3.9.13
 <p> Create two files named minio_user.txt and minio_password.txt , store them in a folder called secrets </p>
 
 
-#### Step:1 Set following Config Variables as per your desire and put in an .env file.
+#### Step:1 Set following Config Variables and put in an .env file.
 
 ```console
 
