@@ -1,23 +1,39 @@
-version: "3.9"
+version: '3'
+
 
 services:
   zookeeper:
-    image: wurstmeister/zookeeper
+    image: 'bitnami/zookeeper:latest'
     container_name: zookeeper
+    hostname: zookeeper
     ports:
-      - "2181:2181"
-  kafka:
-    image: wurstmeister/kafka
-    container_name: kafka
-    ports:
-      - "9092:9092"
+      - '2181:2181'
     environment:
-      KAFKA_ADVERTISED_HOST_NAME: localhost
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CREATE_TOPICS: "cdc_test_topics:1:1"
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    networks:
+      datapipeline:
+        ipv4_address: 172.18.0.3
+  kafka:
+    image: 'bitnami/kafka:latest'
+    container_name: kafka
+    hostname: kafka
+    ports:
+      - '9092:9092'
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://172.18.0.4:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://172.18.0.4:9092
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    depends_on:
+      - zookeeper
+    networks:
+      datapipeline:
+        ipv4_address: 172.18.0.4
   minio:
     image: quay.io/minio/minio
     container_name: minio
+    hostname: minio
     ports:
       - "9000:9000"
       - "9090:9090"
@@ -30,11 +46,23 @@ services:
       - minio_user
       - minio_password
     command: server /data --console-address ":9090"
+    networks:
+      datapipeline:
+        ipv4_address: 172.18.0.5
   spark:
-    image: spark_job:2.0
+    image: spark_job:1.0
     container_name: spark
+    hostname: spark
+    ports:
+      - '8080:8080'
+    depends_on:
+      - kafka
+      - minio
     env_file:
       - .env
+    networks:
+      datapipeline:
+        ipv4_address: 172.18.0.2
 
 secrets:
   minio_user:
@@ -44,3 +72,11 @@ secrets:
 
 volumes:
   minio_storage: {}
+
+networks:
+    datapipeline:
+        driver: bridge
+        ipam:
+            driver: default
+            config:
+                - subnet: "172.18.0.0/16"

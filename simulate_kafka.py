@@ -472,33 +472,57 @@ future = producer.send(topicName, r"""
     "before":null,
     "after":{
         "id":{
-            "value":6,
+            "value":10000,
             "set":true
         },
-        "pin":null,
-        "status":null,
-        "created":null,
-        "creator_type":null,
+        "pin":{
+            "value":"123",
+            "set":true
+        },
+        "status":{
+            "value":1,
+            "set":true
+        },
+        "created":{
+            "value":21312,
+            "set":true
+        },
+        "creator_type":{
+            "value":1,
+            "set":true
+        },
         "creator":{
-            "value":"Zain",
+            "value":"Khan",
             "set":true
         },
-        "status_metadata":null,
-        "updated":'new_value',
-        "updater_type":null,
-        "updater":null
+        "status_metadata":{
+            "value":1,
+            "set":true
+        },
+        "updated":{
+            "value":1,
+            "set":true
+        },
+        "updater_type":{
+            "value":1,
+            "set":true
+        },
+        "updater":{
+            "value":1,
+            "set":true
+        }
     },
     "source":{
         "version":"1.7.0.13-BETA",
         "connector":"yugabytedb",
         "name":"dbserver1",
-        "ts_ms":624639412236329,
+        "ts_ms":1416329,
         "snapshot":"false",
         "db":"testdatabase",
         "sequence":"[\"0:0::0:0\",\"3:6::0:0\"]",
         "schema":"public",
-        "table":"customer",
-        "txId":"",
+        "table":"custsdaomer",
+        "txId":"5",
         "lsn":"3:6::0:0",
         "xmin":null
     },
@@ -506,4 +530,14 @@ future = producer.send(topicName, r"""
     "ts_ms":1667832425466,
     "transaction":null
 }
-}""".encode('utf-8')).get(timeout=30)
+}""".encode('utf-8')).get(timeout=10)
+
+
+#  To consume latest messages and auto-commit offsets
+# consumer = KafkaConsumer('cdc_test_topics',
+#                             auto_offset_reset='earliest',
+#                           bootstrap_servers=['localhost:9092'])
+# for message in consumer:
+#     print ("%s:%d:%d: key=%s value=%s" % (message.topic, message.partition,
+#                                            message.offset, message.key,
+#                                            message.value))

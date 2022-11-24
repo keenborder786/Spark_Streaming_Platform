@@ -12,7 +12,6 @@ from pyspark.sql.functions import col,from_json
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import lit
 from typing import Dict,Optional
-from dotenv import load_dotenv
 
 
 

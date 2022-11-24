@@ -4,17 +4,18 @@
     ## Restoring Table Versions
     ## Querying Table from Specific Timestamp
 
-import pyspark
-import delta
 from delta import DeltaTable
 from typing import Dict
+import pyspark
+import delta
+
 class DeltaLakeInteraction:
 
     def __init__(self,spark , sourcebucket, table_name):
         self.spark_session = spark
         self.bucket = sourcebucket
         self.table_name = table_name
-    
+
     def create_delta_table(self ,schema:pyspark.sql.types.StructType, table_properties:Dict ,*partition_col) -> delta.tables.DeltaTableBuilder:
         """
         This will create a delta table on the delta lake if it does not exist given the configuration.
@@ -126,4 +127,12 @@ class DeltaLakeInteraction:
 
         df = self.spark_session.read.format('delta').option("versionAsOf", version).load("s3a://{}/{}".format(self.bucket,self.table_name))
         return df
-
+    def query_latest_table(self) -> pyspark.sql.DataFrame:
+        """
+        
+        This will return the latest version of our detla lake table
+        
+        
+        """
+        df = self.spark_session.read.format('delta').load("s3a://{}/{}".format(self.bucket,self.table_name))
+        return df

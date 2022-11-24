@@ -10,11 +10,9 @@ sourceBucket = os.environ['SourceBucket']
 kafka_server = os.environ['KafkaServer']
 kafka_config = json.loads(os.environ['KafkaConsumerConfig'])
 topic_name = os.environ['TopicName']
-table_name = os.environ['TableName']
-type_job = os.environ['TypeJob']
 customer_table_config = json.loads(os.environ['CustomerTableConfig'])
-raw_event_table_config = json.loads(os.environ['RawEventTableConfig'])
-cdc_schema = StructType.fromJson(json.loads(os.environ['SourceSchema']))
+fact_hash_id_table_config = json.loads(os.environ['RawEventTableConfig'])
+
 
 spark_config={"spark.sql.extensions":"io.delta.sql.DeltaSparkSessionExtension",
                 "spark.sql.catalog.spark_catalog":"org.apache.spark.sql.delta.catalog.DeltaCatalog",

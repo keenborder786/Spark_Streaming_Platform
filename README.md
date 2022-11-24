@@ -35,8 +35,9 @@ Python 3.9.13
            offline mode : False
 ```
 
+## First Option (Run the spark job on local machine) 
 
-### Setting up conda environment:
+#### Setting up conda environment:
 
 ```console
 conda env create -f environment.yml
@@ -45,17 +46,15 @@ conda env create -f environment.yml
 
 #### Set following Config Variables as per your desire and put in an .env file.
 ```console
-S3USER='user'
-S3Password='password'
-S3EndPoint='127.0.0.1:9000'
-SourceBucket='test'
-KafkaServer='localhost:9092'
-TopicName='cdc_test_topics'
-KafkaConsumerConfig='{"startingOffsets":"latest","failOnDataLoss":"false","minOffsetsPerTrigger":60000,"maxTriggerDelay":"1m"}'
-TableName='cdc_table'
-TypeJob='append'
-DeltaTableConfig='{"delta.appendOnly":"true"}'
-Source_Schema='{"type":"","fields":""}' 
+S3USER=user
+S3Password=password
+S3EndPoint=127.0.0.1:9000
+SourceBucket=test
+KafkaServer=localhost:9092
+TopicName=cdc_test_topics
+KafkaConsumerConfig='{"failOnDataLoss":"false"}'
+RawEventTableConfig='{"delta.appendOnly":"true","delta.enableChangeDataFeed":"true","delta.deletedFileRetentionDuration":"interval 7 days"}'
+CustomerTableConfig='{"delta.appendOnly":"false","delta.enableChangeDataFeed":"true","delta.deletedFileRetentionDuration":"interval 7 days"}'
 
 ```
 <p> KafkaConsumerConfig options can be seen from: https://spark.apache.org/docs/2.1.0/structured-streaming-kafka-integration.html </p>
@@ -82,5 +81,18 @@ d
 ```console
 
 ./bin/spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.1,io.delta:delta-core_2.12:2.1.1,com.amazonaws:aws-java-sdk:1.12.341,org.apache.hadoop:hadoop-aws:3.3.4,org.apache.hadoop:hadoop-common:3.3.4 --conf spark.delta.logStore.class=org.apache.spark.sql.delta.storage.S3SingleDriverLogStore /home/$USER/poc_kafka_delta/main.py
+
+```
+
+<p> You can also build a spark job image as well in order to deploy it on a pod. </p>
+
+
+## Second Option (Build the Image and run on docker compose or k8) 
+
+#### Build Spark Job Image
+
+```console
+
+docker build . --tag spark_job:1.0
 
 ```

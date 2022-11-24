@@ -1,81 +1,144 @@
 ## This modules will contain the business logic for processing multiple streams that are coming from kafka.
-    ## Transcations and Events
+    ## Raw_Messages_IDs
     ## Customers
+    ## Transcations
 from streaming.spark_engine import SparkJob
-from streaming.deltalake_engine  import DeltaLakeInteraction
-from pyspark.sql.functions import from_json,col,when,sha2, concat_ws
-from streaming.config import sourceBucket
+from pyspark.sql.types import StringType,TimestampType
+from pyspark.sql.functions import col,sha2,udf
 import pyspark
+import json
 
 
 class SparkProcessing(SparkJob):
+
     def __init__(self,app_name,master_name,config,hadoop_config):
         super().__init__(app_name,master_name,config,hadoop_config)
     
-    def event_processing(self ,df:pyspark.sql.DataFrame , schema:pyspark.sql.types.StructType) -> pyspark.sql.DataFrame:
+    def event_processing(self ,df:pyspark.sql.DataFrame) -> pyspark.sql.DataFrame:
         """
         
+        This function extracts the payload from raw value column coming from kafka and also form of a unique_message_id
+        to identify each message that has been processed.
+
+
         Parameters:
         -----------------------------------------------------------------
         df(pyspark.sql.DataFrame): Raw Events Dataframe loaded from kafka that needs to be processed
-        
-        schema(pyspark.sql.types.StructType): The schema for raw event cdc coming from kafka. This needs to carefully matched with json otherwise
-        stream will start giving nulls!!!
-        
+                
 
         Returns:    
         ------------------------------------------------------------------
         pyspark.sql.DataFrame
         
         """
+        ### User Defined Functions to parse the json string coming from kafka
+        @udf
+        def to_json(s):
+            """
+            Converts coming kafka json string to JSON type in the dataframe.
+            
+            """
+            
+            s=json.loads(s)
+            return s
+
+        @udf
+        def extract_payload(s):
+            """
+
+            Extracting the payload from the value_json column
+
+            """
+            return s['payload']
+
+        @udf 
+        def extract_source(s):
+            """
+            Extracting the source from the payload
+            
+            """
+            return s['source']
+
+        @udf
+        def extract_unique_identifier(s):
+            """
+            Creating the unique identifier from source of payload
+            
+            """
+            return s['db'] + '||' + s['sequence'] + '||' +s['table'] + '||' + s['txId']
+
+        @udf
+        def extract_payload_after(payload_data):
+            """
+            Extracting the updated value from the payload
+            
+            """
+            return payload_data['after']
+    
+        df = df.withColumn('value', col('value').cast('string')).withColumn('value_json',to_json(col('value'))).withColumn('payload',extract_payload(col('value_json'))) \
+            .withColumn('source',extract_source(col('payload'))) \
+            .withColumn('after_payload',extract_payload_after(col('payload')))
         
-        df = df.withColumn('value_json', from_json(col('value').cast('string'), schema))
-        df = df.withColumn('unique_message_id',sha2(concat_ws('||',col('value_json.payload.source.version'),
-                                                    col('value_json.payload.source.connector'),
-                                                    col('value_json.payload.source.name'),
-                                                    col('value_json.payload.source.ts_ms'),
-                                                    col('value_json.payload.source.snapshot'),
-                                                    col('value_json.payload.source.db'),
-                                                    col('value_json.payload.source.sequence'),
-                                                    col('value_json.payload.source.schema'),
-                                                    col('value_json.payload.source.table'),
-                                                    col('value_json.payload.source.txId'),
-                                                    col('value_json.payload.source.lsn'),
-                                                    col('value_json.payload.source.xmin')),256)).withColumn('meta_data',col('value_json.schema')) \
-                .withColumn('payload',col('value_json.payload')).select('unique_message_id','value_json','meta_data','payload','timestamp')
-   
+        df = df.withColumn('unique_message_id',extract_unique_identifier(col('source')))
+        df = df.withColumn('unique_message_id',sha2(col('unique_message_id'),256))
+    
+        df = df.select(['unique_message_id','after_payload'])
         return df
 
-    def customer_processing(self , df:pyspark.sql.DataFrame) -> pyspark.sql.DataFrame:
+    def customer_table_processing(self , df:pyspark.sql.DataFrame) -> pyspark.sql.DataFrame:
         """
-        This function will parse the payload in the streaming df and take the desired columns from payload for the customer table.
+        This function will parse the payload in the streaming df and take the desired columns from payload for the given table.
 
         Parameters:
         -----------------------------------------------------------------
-        df(pyspark.sql.DataFrame): Streaming data which consist of payload column that needs to be used to update the customer table
+        df(pyspark.sql.DataFrame): Streaming data which consist of payload column that needs to be used to update the table
         
-        
-
         Returns:    
         ------------------------------------------------------------------
         pyspark.sql.DataFrame
-
-        
         """
+        ## Due to restriction in pyspark straming we are extracting values from the given field in way. We might need to find a viable alternative for the long-term
+        ## Can't use the for loops, it gives an error. There is a way to pass column name in argument in pyspark in udf but in streaming it gives an error.
+        
+        @udf
+        def customer_id(field):
+            return (field['id']['value'] if type(field['id'])==dict else field['id'])
+        @udf
+        def customer_status(field):
+            return (field['status']['value'] if type(field['status'])==dict else field['status'])
+        @udf
+        def customer_status_metadatafield(field):
+            return (field['status_metadata']['value'] if type(field['status_metadata'])==dict else field['status_metadata'])
+        @udf
+        def customer_creator(field):
+            return (field['creator']['value'] if type(field['creator'])==dict else field['creator'])
+        @udf
+        def customer_created(field):
+            return (field['created']['value'] if type(field['created'])==dict else field['created'])
+        @udf
+        def customer_creator_type(field):
+            return (field['creator_type']['value'] if type(field['creator_type'])==dict else field['creator_type'])
+        @udf
+        def customer_updater(field):
+            return (field['updater']['value'] if type(field['updater'])==dict else field['updater'])
+        @udf
+        def customer_updated(field):
+            return (field['updated']['value'] if type(field['updated'])==dict else field['updated'])
+        @udf
+        def customer_updater_type(field):
+            return (field['updater_type']['value'] if type(field['id'])==dict else field['updater_type'])
 
-        ## We need to decide on the payload schema
-        df = df.select('payload')
-        df = df.withColumn('new_data',col('payload.after'))
-        df = df.withColumn('id',col('new_data.id'))
-        df = df.withColumn('status',col('new_data.status'))
-        df = df.withColumn('status_metadata',col('new_data.status_metadata'))
-        df = df.withColumn('creator',col('new_data.creator'))
-        df = df.withColumn('created',col('new_data.created'))
-        df = df.withColumn('creator_type',col('new_data.creator_type'))
-        df = df.withColumn('updater',col('new_data.updater'))
-        df = df.withColumn('updated',col('new_data.updated'))
-        df = df.withColumn('updater_type',col('new_data.updater_type'))
-        df = df.select('id','status','status_metadata','creator','creator_type','updater','updated','updater_type')
+         
+        df = df.withColumn('id',customer_id(col('after_payload')).cast(StringType())) \
+        .withColumn('status',customer_status(col('after_payload')).cast(StringType())) \
+        .withColumn('status_metadata',customer_status_metadatafield(col('after_payload')).cast(StringType())) \
+        .withColumn('creator',customer_creator(col('after_payload')).cast(StringType())) \
+        .withColumn('created',customer_created(col('after_payload')).cast(TimestampType())) \
+        .withColumn('creator_type',customer_creator_type(col('after_payload')).cast(StringType())) \
+        .withColumn('updater',customer_updater(col('after_payload')).cast(StringType())) \
+        .withColumn('updated',customer_updated(col('after_payload')).cast(TimestampType())) \
+        .withColumn('updater_type',customer_updater_type(col('after_payload')).cast(StringType())).dropDuplicates()
+        df = df.drop('after_payload')
         return df
 
         
