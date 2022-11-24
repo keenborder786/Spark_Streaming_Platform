@@ -9,42 +9,36 @@
 Python 3.9.13
 
 
+### How to test run the pipeline?
+
 #### Step:0 Create minio credentials:
 
-## First Option (Run the spark job on local machine) 
 <p> Create two files named minio_user.txt and minio_password.txt , store them in a folder called secrets </p>
 
-### Setting up conda environment:
+
+#### Step:1 Set following Config Variables as per your desire and put in an .env file.
 
 ```console
-conda env create -f environment.yml
 
-```
-
-#### Set following Config Variables as per your desire and put in an .env file.
-```console
-S3USER='user'
-S3Password='password'
-S3EndPoint='127.0.0.1:9000'
-SourceBucket='test'
-KafkaServer='localhost:9092'
-TopicName='cdc_test_topics'
-KafkaConsumerConfig='{"startingOffsets":"latest","failOnDataLoss":"false","minOffsetsPerTrigger":60000,"maxTriggerDelay":"1m"}'
-TableName='cdc_table'
-TypeJob='append'
-DeltaTableConfig='{"delta.appendOnly":"true"}'
-Source_Schema='{"type":"","fields":""}' 
+S3USER=user ## same as what your stored in minio_user.txt
+S3Password=password ## same as what your stored in minio_password.txt
+S3EndPoint=172.18.0.5:9000
+SourceBucket=test
+KafkaServer=172.18.0.3:9092
+TopicName=cdc_test_topics
+KafkaConsumerConfig='{"failOnDataLoss":"false"}'
+RawEventTableConfig='{"delta.appendOnly":"true","delta.enableChangeDataFeed":"true","delta.deletedFileRetentionDuration":"interval 7 days"}'
+CustomerTableConfig='{"delta.appendOnly":"false","delta.enableChangeDataFeed":"true","delta.deletedFileRetentionDuration":"interval 7 days"}'
 
 ```
 <p> KafkaConsumerConfig options can be seen from: https://spark.apache.org/docs/2.1.0/structured-streaming-kafka-integration.html </p>
 <p> DeltaTableConfig (for Raw and Customer Tables) options can be seen from: https://docs.delta.io/latest/table-properties.html </p>
-<p> Source_Schema can be generated from StructType.jsonValue() </p>
 
 #### Step:2 Build the docker image for spark_job
 
 ```console
 
-docker build . --tag spark_job:2.0
+docker build . --tag spark_job:1.0
 
 ```
 
@@ -55,17 +49,21 @@ docker build . --tag spark_job:2.0
 docker-compose up
 
 ```
+<p> NOTE: The setting up of services might take some time for the first time since spark need to download the packages from internet </p>
 
-<p> You can also build a spark job image as well in order to deploy it on a pod. </p>
+#### Step:4 Run simulate_kafka.py
 
-
-## Second Option (Build the Image and run on docker compose or k8) 
-
-#### Build Spark Job Image
+```console
+docker exec -it spark bash
+```
+<p> Once in the spark container shell, cd to poc_kafka_delta since you will be already in opt folder and then run simulate_kafka.py
 
 ```console
 
-docker build . --tag spark_job:1.0
+cd poc_kafka_delta
+python simulate_kafka.py
 
 ```
-#### Step: 4 Run simulate_kafka.py on host machine to send messages for processing and uploading to minio
+
+<p> Note: Right now simulate_kafka will only send one message to kafka cluster therefore you might have to have run the file multiple time while
+manually changing the values.
