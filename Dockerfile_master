@@ -1,0 +1,9 @@
+FROM spark_base:1.0
+
+
+## Execute the final shell script to run our job
+CMD $SPARK_HOME/sbin/start-master.sh
+
+
+
+

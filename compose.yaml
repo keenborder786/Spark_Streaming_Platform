@@ -49,20 +49,50 @@ services:
     networks:
       datapipeline:
         ipv4_address: 172.18.0.5
-  spark:
-    image: spark_job:1.0
-    container_name: spark
-    hostname: spark
+  spark_master:
+    image: spark_master:1.0
+    container_name: spark_master
+    hostname: spark_master
+    tty: true
     ports:
       - '8080:8080'
+      - '7077:7077'
     depends_on:
       - kafka
       - minio
+    networks:
+      datapipeline:
+        ipv4_address: 172.18.0.6
+  spark_worker:
+    image: spark_worker:1.0
+    container_name: spark_worker
+    hostname: spark_worker
+    environment:
+      MASTER_HOST_NAME: spark://172.18.0.6:7077
+      WORKER_MEMORY: 1G
+    tty: true
+    ports:
+      - '8081:8081'
+    depends_on:
+      - spark_master
+    networks:
+      datapipeline:
+        ipv4_address: 172.18.0.7
+  spark_client:
+    image: spark_client:1.0
+    container_name: spark_client
+    hostname: spark_client
+    ports:
+      - '4040:4040'
+      - '8888:8888'
+    depends_on:
+      - spark_master
     env_file:
       - .env
     networks:
       datapipeline:
-        ipv4_address: 172.18.0.2
+        ipv4_address: 172.18.0.8
+
 
 secrets:
   minio_user:
