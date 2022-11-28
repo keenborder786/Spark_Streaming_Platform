@@ -1,4 +1,4 @@
-FROM spark_base:1.0
+FROM sparkbase:1.0
 
 ENV MASTER_HOST_NAME=spark://172.18.0.6:7077
 ENV WORKER_MEMORY=1G

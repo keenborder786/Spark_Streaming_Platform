@@ -11,8 +11,8 @@ import json
 
 class SparkProcessing(SparkJob):
 
-    def __init__(self,app_name,master_name,config,hadoop_config):
-        super().__init__(app_name,master_name,config,hadoop_config)
+    def __init__(self,app_name,hadoop_config):
+        super().__init__(app_name,hadoop_config)
     
     def event_processing(self ,df:pyspark.sql.DataFrame) -> pyspark.sql.DataFrame:
         """

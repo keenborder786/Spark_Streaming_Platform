@@ -1,4 +1,4 @@
-FROM spark_base:1.0
+FROM sparkbase:1.0
 
 
 ## Execute the final shell script to run our job

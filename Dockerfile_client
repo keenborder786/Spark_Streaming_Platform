@@ -1,11 +1,11 @@
-FROM spark_base:1.0
+FROM sparkbase:1.0
 
 
 ## Setting up my code
 COPY streaming/ /opt/poc_kafka_delta/streaming/
 COPY main.py /opt/poc_kafka_delta
 COPY simulate_kafka.py /opt/poc_kafka_delta
-
+COPY spark-defaults.conf /opt/spark/conf
 
 ## Execute the final shell script to run our job
 CMD $SPARK_HOME/bin/spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.1 /opt/poc_kafka_delta/main.py
