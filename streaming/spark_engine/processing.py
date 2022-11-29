@@ -38,7 +38,11 @@ class SparkProcessing(SparkJob):
             Converts coming kafka json string to JSON type in the dataframe.
             
             """
-            
+            if s is None:
+                empty_payload = {}
+                empty_payload['payload'] = None
+                return empty_payload
+
             s=json.loads(s)
             return s
 
@@ -75,10 +79,11 @@ class SparkProcessing(SparkJob):
             """
             return payload_data['after']
     
-        df = df.withColumn('value', col('value').cast('string')).withColumn('value_json',to_json(col('value'))).withColumn('payload',extract_payload(col('value_json'))) \
-            .withColumn('source',extract_source(col('payload'))) \
+        df = df.withColumn('value', col('value').cast('string')).withColumn('value_json',to_json(col('value'))).withColumn('payload',extract_payload(col('value_json'))) 
+        df = df.filter((df.payload.isNotNull()))
+
+        df = df.withColumn('source',extract_source(col('payload'))) \
             .withColumn('after_payload',extract_payload_after(col('payload')))
-        
         df = df.withColumn('unique_message_id',extract_unique_identifier(col('source')))
         df = df.withColumn('unique_message_id',sha2(col('unique_message_id'),256))
     

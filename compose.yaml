@@ -57,6 +57,8 @@ services:
     ports:
       - '8080:8080'
       - '7077:7077'
+    volumes:
+      - spark_packages:/root/.ivy2/jars
     depends_on:
       - kafka
       - minio
@@ -73,6 +75,8 @@ services:
     tty: true
     ports:
       - '8081:8081'
+    volumes:
+      - spark_packages:/root/.ivy2/jars
     depends_on:
       - sparkmaster
     networks:
@@ -86,11 +90,14 @@ services:
       - '4040:4040'
     depends_on:
       - sparkmaster
+    volumes:
+      - spark_packages:/root/.ivy2/jars
     env_file:
       - .env
     networks:
       datapipeline:
         ipv4_address: 172.18.0.8
+        
 
 
 secrets:
@@ -100,7 +107,8 @@ secrets:
     file: ./secrets/minio_password.txt
 
 volumes:
-  minio_storage: {}
+  minio_storage:  {}
+  spark_packages: {}
 
 networks:
     datapipeline:
