@@ -3,7 +3,7 @@
 
 
 import pyspark
-import json
+
 from dotenv import load_dotenv,find_dotenv
 load_dotenv(find_dotenv() , override = True)
 from pyspark.storagelevel import StorageLevel
@@ -109,6 +109,8 @@ if __name__ == '__main__':
         .start()
     
     ##### Updating the customer table data on delta lake from our new messages
-    customer_table_streaming = customer_update.repartition(1).writeStream.foreachBatch(batch_function_customer_processing).outputMode("update") \
+    final_streaming = customer_update.repartition(1).writeStream.foreachBatch(batch_function_customer_processing).outputMode("update") \
         .option("checkpointLocation", "s3a://{}/{}/_checkpoint".format(sourceBucket,'DimCustomer')) \
-        .start().awaitTermination()
+        .start()
+    spark_processor.spark_session.streams.awaitAnyTermination()
+    

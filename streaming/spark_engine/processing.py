@@ -2,6 +2,8 @@
     ## Raw_Messages_IDs
     ## Customers
     ## Transcations
+from json.decoder import JSONDecodeError
+from pyspark.sql.functions import lit
 from streaming.spark_engine import SparkJob
 from pyspark.sql.types import StringType,TimestampType
 from pyspark.sql.functions import col,sha2,udf
@@ -39,11 +41,6 @@ class SparkProcessing(SparkJob):
             
             """
             
-            if s is None:
-                empty_payload = {}
-                empty_payload['payload'] = None
-                return empty_payload
-
             s=json.loads(s)
             return s
 
@@ -54,42 +51,48 @@ class SparkProcessing(SparkJob):
             Extracting the payload from the value_json column
 
             """
-            return s['payload']
 
+            return s['payload']
+            
+    
         @udf 
         def extract_source(s):
             """
             Extracting the source from the payload
             
             """
+            
             return s['source']
-
+            
         @udf
         def extract_unique_identifier(s):
             """
             Creating the unique identifier from source of payload
             
             """
+            
             return s['db'] + '||' + s['sequence'] + '||' +s['table'] + '||' + s['txId']
-
+            
         @udf
         def extract_payload_after(payload_data):
             """
             Extracting the updated value from the payload
             
             """
+            
             return payload_data['after']
-        
+           
+                
 
-        df = df.withColumn('value', col('value').cast('string')).withColumn('value_json',to_json(col('value'))).withColumn('payload',extract_payload(col('value_json'))) 
-        df = df.filter((df.payload.isNotNull()))
-
-        df = df.withColumn('source',extract_source(col('payload'))) \
-            .withColumn('after_payload',extract_payload_after(col('payload')))
-        df = df.withColumn('unique_message_id',extract_unique_identifier(col('source')))
+        df = df.withColumn('value', col('value').cast('string'))
+        df = df.filter((df.value.isNotNull()) & (df.value.cast(StringType()).like('%payload%'))) ## Safety Check: Payload should be present
+        df = df.withColumn('value_json',to_json(col('value')))## Making the StructType Column out of Value Column
+        df = df.withColumn('payload',extract_payload(col('value_json'))) ## Extracted the Main Payload
+        df = df.withColumn('source',extract_source(col('payload')))## Extracted the Main Source
+        df = df.withColumn('after_payload',extract_payload_after(col('payload')))## Extracted the Updated Values from Payload
+        df = df.withColumn('unique_message_id',extract_unique_identifier(col('source')))## Created the Unique Message ID from source fields
         df = df.withColumn('unique_message_id',sha2(col('unique_message_id'),256))
-    
-        df = df.select(['unique_message_id','after_payload'])
+        df = df.select(['unique_message_id','after_payload'])## Sending in the updated values
         return df
 
     def customer_table_processing(self , df:pyspark.sql.DataFrame) -> pyspark.sql.DataFrame:
@@ -133,9 +136,11 @@ class SparkProcessing(SparkJob):
             return (field['updated']['value'] if type(field['updated'])==dict else field['updated'])
         @udf
         def customer_updater_type(field):
-            return (field['updater_type']['value'] if type(field['id'])==dict else field['updater_type'])
-
-         
+            return (field['updater_type']['value'] if type(field['updater_type'])==dict else field['updater_type'])
+            
+        df = df.filter(df.after_payload.like('%id%'))## Safety Check: if id is present or not. If not then filter them out.
+        
+        ############ Customer Fields #####################################
         df = df.withColumn('id',customer_id(col('after_payload')).cast(StringType())) \
         .withColumn('status',customer_status(col('after_payload')).cast(StringType())) \
         .withColumn('status_metadata',customer_status_metadatafield(col('after_payload')).cast(StringType())) \
@@ -145,6 +150,7 @@ class SparkProcessing(SparkJob):
         .withColumn('updater',customer_updater(col('after_payload')).cast(StringType())) \
         .withColumn('updated',customer_updated(col('after_payload')).cast(TimestampType())) \
         .withColumn('updater_type',customer_updater_type(col('after_payload')).cast(StringType())).dropDuplicates()
+        #####################################################################
         df = df.drop('after_payload')
         return df
 
