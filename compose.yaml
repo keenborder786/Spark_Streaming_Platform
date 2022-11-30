@@ -1,6 +1,5 @@
 version: '3'
 
-
 services:
   zookeeper:
     image: 'bitnami/zookeeper:latest'
@@ -49,20 +48,59 @@ services:
     networks:
       datapipeline:
         ipv4_address: 172.18.0.5
-  spark:
-    image: spark_job:1.0
-    container_name: spark
-    hostname: spark
+  sparkmaster:
+    image: sparkmaster:1.0
+    container_name: sparkmaster
+    hostname: sparkmaster
+    tty: true
     ports:
       - '8080:8080'
+      - '7077:7077'
+    volumes:
+      - spark_packages:/root/.ivy2/jars
+      - spark_cache:/root/.ivy2/cache
     depends_on:
       - kafka
       - minio
+    networks:
+      datapipeline:
+        ipv4_address: 172.18.0.6
+  sparkworker:
+    image: sparkworker:1.0
+    container_name: sparkworker
+    hostname: sparkworker
+    environment:
+      MASTER_HOST_NAME: spark://172.18.0.6:7077
+      WORKER_MEMORY: 1G
+    tty: true
+    ports:
+      - '8081:8081'
+    volumes:
+      - spark_packages:/root/.ivy2/jars
+      - spark_cache:/root/.ivy2/cache
+    depends_on:
+      - sparkmaster
+    networks:
+      datapipeline:
+        ipv4_address: 172.18.0.7
+  sparkclient:
+    image: sparkclient:1.0
+    container_name: sparkclient
+    hostname: sparkclient
+    ports:
+      - '4040:4040'
+    depends_on:
+      - sparkmaster
+    volumes:
+      - spark_packages:/root/.ivy2/jars
+      - spark_cache:/root/.ivy2/cache
     env_file:
       - .env
     networks:
       datapipeline:
-        ipv4_address: 172.18.0.2
+        ipv4_address: 172.18.0.8
+        
+
 
 secrets:
   minio_user:
@@ -71,7 +109,9 @@ secrets:
     file: ./secrets/minio_password.txt
 
 volumes:
-  minio_storage: {}
+  minio_storage:  {}
+  spark_packages: {}
+  spark_cache:    {}
 
 networks:
     datapipeline:

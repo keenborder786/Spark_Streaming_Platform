@@ -11,19 +11,16 @@ kafka_server = os.environ['KafkaServer']
 kafka_config = json.loads(os.environ['KafkaConsumerConfig'])
 topic_name = os.environ['TopicName']
 customer_table_config = json.loads(os.environ['CustomerTableConfig'])
-fact_hash_id_table_config = json.loads(os.environ['RawEventTableConfig'])
-
-
-spark_config={"spark.sql.extensions":"io.delta.sql.DeltaSparkSessionExtension",
-                "spark.sql.catalog.spark_catalog":"org.apache.spark.sql.delta.catalog.DeltaCatalog",
-                "spark.executor.extraJavaOptions":"-Dcom.amazonaws.services.s3.enableV4=true",
-                "spark.driver.extraJavaOptions":"-Dcom.amazonaws.services.s3.enableV4=true",
-                "spark.streaming.receiver.writeAheadLog.enable":"true",
-                "spark.streaming.driver.writeAheadLog.closeFileAfterWrite":"true",
-                "spark.streaming.receiver.writeAheadLog.closeFileAfterWrite":"true",
-                "spark.databricks.delta.vacuum.parallelDelete.enabled":"true",
-                "spark.databricks.delta.optimize.repartition.enabled":"true"
-                }
+customer_fields_map = {'id':'update_table.id',
+                        'status':'update_table.status',
+                        'status_metadata':'update_table.status_metadata',
+                        'creator':'update_table.creator',
+                        'created':'update_table.created',
+                        'creator_type':'update_table.creator_type',
+                        'updater':'update_table.updater',
+                        'updated':'update_table.updated',
+                        'updater_type':'update_table.updater_type'
+                        }
 hadoop_config={"fs.s3a.endpoint":s3endPointLoc,
                 "fs.s3a.access.key":s3accessKeyAws,
                 "fs.s3a.secret.key":s3secretKeyAws,

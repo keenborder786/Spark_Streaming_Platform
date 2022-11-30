@@ -16,12 +16,11 @@ from typing import Dict,Optional
 
 
 class SparkJob:
-    def __init__(self,app_name,master_name,config,hadoop_config):
-        self.spark_session = self.get_spark_session(app_name,master_name,config,hadoop_config)
+    def __init__(self,app_name,hadoop_config):
+        self.spark_session = self.get_spark_session(app_name,hadoop_config)
 
 
     def get_spark_session(self,app_name:str , 
-                        master_name:str, config:Optional[Dict] = {}, 
                         hadoop_config:Optional[Dict] = {}) -> pyspark.sql.SparkSession:
         """
         Start the spark session.
@@ -30,10 +29,6 @@ class SparkJob:
         ---------------------------
         app_name(str): The name given to the instance of spark session
 
-        master_name(str): The url for the spark cluster
-        
-        config(dict , optional): The dictionary which contains the configuration for spark session
-
         hadoop_config(dict,optional): The hadoop configuration for our spark session
 
         Returns:
@@ -41,28 +36,19 @@ class SparkJob:
         SparkSession: Instance of spark session
         
         """
-        if config == {}:
-            spark = (
-                SparkSession.builder.appName(app_name)
-                .master(master_name)
-                .getOrCreate()
-            )
-            return 
-        else:
-            spark = (
-                SparkSession.builder.appName(app_name)
-                .master(master_name)
-                .getOrCreate()
-            )
-            configuration = config.items()
-            spark.sparkContext._conf.setAll(configuration)
-            spark.sparkContext.setSystemProperty("com.amazonaws.services.s3.enableV4", "true")
-            spark.sparkContext.setLogLevel('Error')
-            if hadoop_config != {}:
-                for k,v in hadoop_config.items():
-                    spark.sparkContext._jsc.hadoopConfiguration().set(k, v)
+        
+        spark = (
+            SparkSession.builder.appName(app_name)\
+            .getOrCreate()
+        )
+        spark.sparkContext.setSystemProperty("com.amazonaws.services.s3.enableV4", "true")
+        spark.sparkContext.setLogLevel('Error')
+           
+        if hadoop_config != {}:
+            for k,v in hadoop_config.items():
+                spark.sparkContext._jsc.hadoopConfiguration().set(k, v)
 
-            return spark
+        return spark
 
 
     def read_kafka_stream(self , 
