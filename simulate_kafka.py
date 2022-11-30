@@ -1,5 +1,3 @@
-
-
 ## Will generate multiple payloads to kafka broker on the given server
 from kafka import KafkaProducer
 bootstrap_servers = ['172.18.0.4:9092']
@@ -292,7 +290,6 @@ r"""
 		"transaction": null
 	}
 }
-
 """,
 r"""{}""",
 r"""null"""]

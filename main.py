@@ -84,9 +84,11 @@ if __name__ == '__main__':
     customer_table_deltalake_instance = DeltaLakeInteraction(spark_processor.spark_session, sourceBucket , 'DimCustomer')
     customer_table = customer_table_deltalake_instance.create_delta_table(customer_update.drop('time_event','op').schema, customer_table_config)
 
+
    
     ##### Updating the customer table data on delta lake from our new events
     final_streaming = customer_update.repartition(1).writeStream.foreachBatch(batch_function_customer_processing).outputMode("update") \
         .option("checkpointLocation", "s3a://{}/{}/_checkpoint".format(sourceBucket,'DimCustomer')) \
         .start()
     spark_processor.spark_session.streams.awaitAnyTermination()
+

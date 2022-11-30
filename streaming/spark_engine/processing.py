@@ -64,7 +64,6 @@ class SparkProcessing(SparkJob):
     def customer_table_processing(self , df:pyspark.sql.DataFrame) -> pyspark.sql.DataFrame:
         """
         This function will parse the payload in the streaming df and take the desired columns from payload for the given table.
-
         Parameters:
         -----------------------------------------------------------------
         df(pyspark.sql.DataFrame): Streaming data which consist of payload column that needs to be used to update the table
