@@ -3,7 +3,7 @@
 
 
 import pyspark
-import json
+
 from dotenv import load_dotenv,find_dotenv
 load_dotenv(find_dotenv() , override = True)
 from pyspark.storagelevel import StorageLevel
@@ -23,18 +23,14 @@ from streaming.config import (
 
 def batch_function_raw_events(micro_df:pyspark.sql.types.Row, batch_id:int) -> None:
     """
-
     This functions insert every message consisting of CDC payload as it on Delta Lake. Making sure
     that each message is only written once.
     After every 100 batches, we run the optimize command to compact the parquet files created by delta lake
     
-
     Parameters:
     ----------------
     micro_df(pyspark.sql.types.Row): The current batch from our streaming data frame
-
     batch_id(int): The number of batch that we are processing for our pipeline
-
             
     Returns
     -----------  
@@ -59,9 +55,7 @@ def batch_function_customer_processing(micro_df:pyspark.sql.DataFrame, batch_id:
     Parameters:
     ----------------
     micro_df(pyspark.sql.types.Row): The current batch from our streaming data frame
-
     batch_id(int): The number of batch that we are processing for our pipeline
-
             
     Returns
     -----------  
@@ -81,15 +75,14 @@ def batch_function_customer_processing(micro_df:pyspark.sql.DataFrame, batch_id:
 if __name__ == '__main__':
 
     #Setting up the spark session
-    spark_processor = SparkProcessing('kafka_delta',hadoop_config)
-    
-    # raw_events_deltalake_instance = DeltaLakeInteraction(spark_processor.spark_session, sourceBucket , 'FactHashIDs')
+    spark_processor = SparkProcessing('kafka_delta' ,hadoop_config)
+    raw_events_deltalake_instance = DeltaLakeInteraction(spark_processor.spark_session, sourceBucket , 'FactHashIDs')
 
-    # #Reading kafka stream
+    #Reading kafka stream
     df = spark_processor.read_kafka_stream(kafka_server, topic_name, 'latest',kafka_config)
     
 
-    # #### Processing the raw_events coming from kafka. Taking out the unique_message_id and payload which contains the values for our table.
+    #### Processing the raw_events coming from kafka. Taking out the unique_message_id and payload which contains the values for our table.
     raw_events = spark_processor.event_processing(df)
     
     ##### Create the FactHashID tables if it does not exists. FactHashID will consist of hashes of messages_ids that have been processed so far.
@@ -110,6 +103,7 @@ if __name__ == '__main__':
         .start()
     
     ##### Updating the customer table data on delta lake from our new messages
-    customer_table_streaming = customer_update.repartition(1).writeStream.foreachBatch(batch_function_customer_processing).outputMode("update") \
+    final_streaming = customer_update.repartition(1).writeStream.foreachBatch(batch_function_customer_processing).outputMode("update") \
         .option("checkpointLocation", "s3a://{}/{}/_checkpoint".format(sourceBucket,'DimCustomer')) \
-        .start().awaitTermination()
+        .start()
+    spark_processor.spark_session.streams.awaitAnyTermination()
