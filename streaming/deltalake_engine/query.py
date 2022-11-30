@@ -33,7 +33,6 @@ class DeltaLakeInteraction:
         delta.tables.DeltaTableBuilder
     
         """  
-        
         delta_table = DeltaTable.createIfNotExists(self.spark_session) \
             .tableName(self.table_name) \
             .addColumns(schema) \

@@ -2,10 +2,9 @@
     ## Raw_Messages_IDs
     ## Customers
     ## Transcations
-from json.decoder import JSONDecodeError
-from pyspark.sql.functions import lit
+
 from streaming.spark_engine import SparkJob
-from pyspark.sql.types import StringType,TimestampType
+from pyspark.sql.types import StringType,TimestampType,IntegerType
 from pyspark.sql.functions import col,sha2,udf
 import pyspark
 import json
@@ -48,51 +47,29 @@ class SparkProcessing(SparkJob):
             """
 
             return s['payload']
-            
-    
-        @udf 
-        def extract_source(s):
-            """
-            Extracting the source from the payload
-            
-            """
-            
-            return s['source']
-            
+        
         @udf
-        def extract_unique_identifier(s):
-            """
-            Creating the unique identifier from source of payload
-            
+        def extract_time(s):
             """
             
-            return s['db'] + '||' + s['sequence'] + '||' +s['table'] + '||' + s['txId']
-            
-        @udf
-        def extract_payload_after(payload_data):
-            """
-            Extracting the updated value from the payload
+            Extracting the time at which Debezium processed the event. This will be needed to get the latest update, if multiple events are coming
+            for a id in the same micro batch
             
             """
-            
-            return payload_data['after']
-           
-                
+            return s['ts_ms']
 
         df = df.withColumn('value', col('value').cast('string'))
-        df = df.filter((df.value.isNotNull()) & (df.value.cast(StringType()).like('%payload%'))) ## Safety Check: Payload should be present
+        df = df.filter((df.value.isNotNull()) & (df.value.cast(StringType()).like('%payload%'))) ## Safety Check: Payload should be present. Accountng for any null values.
         df = df.withColumn('value_json',to_json(col('value')))## Making the StructType Column out of Value Column
         df = df.withColumn('payload',extract_payload(col('value_json'))) ## Extracted the Main Payload
-        df = df.withColumn('source',extract_source(col('payload')))## Extracted the Main Source
-        df = df.withColumn('after_payload',extract_payload_after(col('payload')))## Extracted the Updated Values from Payload
-        df = df.withColumn('unique_message_id',extract_unique_identifier(col('source')))## Created the Unique Message ID from source fields
-        df = df.withColumn('unique_message_id',sha2(col('unique_message_id'),256))
-        df = df.select(['unique_message_id','after_payload'])## Sending in the updated values
+        df = df.withColumn('ts_ms',extract_time('payload'))
+        df = df.select(['payload','ts_ms'])## Sending in the updated,before values and the type of operation that was done
         return df
 
     def customer_table_processing(self , df:pyspark.sql.DataFrame) -> pyspark.sql.DataFrame:
         """
         This function will parse the payload in the streaming df and take the desired columns from payload for the given table.
+
         Parameters:
         -----------------------------------------------------------------
         df(pyspark.sql.DataFrame): Streaming data which consist of payload column that needs to be used to update the table
@@ -104,46 +81,78 @@ class SparkProcessing(SparkJob):
         ## Due to restriction in pyspark straming we are extracting values from the given field in way. We might need to find a viable alternative for the long-term
         ## Can't use the for loops, it gives an error. There is a way to pass column name in argument in pyspark in udf but in streaming it gives an error.
         
+        ##### Customer Fields ###########
         @udf
         def customer_id(field):
-            return (field['id']['value'] if type(field['id'])==dict else field['id'])
+            if field['op'] != 'd':## If operation is not of delete type then take the after payload
+                return (field['after']['id']['value'] if type(['after']['id']) == dict else field['after']['id'])
+            else:
+                return (field['before']['id']['value'] if type(['before']['id']) == dict else field['before']['id'])
+
         @udf
         def customer_status(field):
-            return (field['status']['value'] if type(field['status'])==dict else field['status'])
+            if field['op'] != 'd':## If operation is not of delete type then take the after payload
+                return (field['after']['status']['value'] if type(['after']['status']) == dict else field['after']['status'])## This accounts for the fact that if the value for field is null then it won't be of dict type
+            else:
+                return (field['before']['status']['value'] if type(['before']['status']) == dict else field['before']['status'])
         @udf
         def customer_status_metadatafield(field):
-            return (field['status_metadata']['value'] if type(field['status_metadata'])==dict else field['status_metadata'])
+            if field['op'] != 'd':## If operation is not of delete type then take the after payload
+                return (field['after']['status_metadata']['value'] if type(['after']['status_metadata']) == dict else field['after']['status_metadata'])
+            else:
+                return (field['before']['status_metadata']['value'] if type(['before']['status_metadata']) == dict else field['before']['status_metadata'])
         @udf
         def customer_creator(field):
-            return (field['creator']['value'] if type(field['creator'])==dict else field['creator'])
+            if field['op'] != 'd':
+                return (field['after']['creator']['value'] if type(['after']['creator']) == dict else field['after']['creator'])
+            else:
+                return (field['before']['creator']['value'] if type(['before']['creator']) == dict else field['before']['creator'])
         @udf
         def customer_created(field):
-            return (field['created']['value'] if type(field['created'])==dict else field['created'])
+            if field['op'] != 'd':
+                return (field['after']['created']['value'] if type(['after']['created']) == dict else field['after']['created'])
+            else:
+                return (field['before']['created']['value'] if type(['before']['created']) == dict else field['before']['created'])
         @udf
         def customer_creator_type(field):
-            return (field['creator_type']['value'] if type(field['creator_type'])==dict else field['creator_type'])
+            if field['op'] != 'd':
+                return (field['after']['creator_type']['value'] if type(['after']['creator_type']) == dict else field['after']['creator_type'])
+            else:
+                return (field['before']['creator_type']['value'] if type(['before']['creator_type']) == dict else field['before']['creator_type'])
         @udf
         def customer_updater(field):
-            return (field['updater']['value'] if type(field['updater'])==dict else field['updater'])
+            if field['op'] != 'd':
+                return (field['after']['updater']['value'] if type(['after']['updater']) == dict else field['after']['updater'])
+            else:
+                return (field['before']['updater']['value'] if type(['before']['updater']) == dict else field['before']['updater'])
         @udf
         def customer_updated(field):
-            return (field['updated']['value'] if type(field['updated'])==dict else field['updated'])
+            if field['op'] != 'd':
+                return (field['after']['updated']['value'] if type(['after']['updated']) == dict else field['after']['updated'])
+            else:
+                return (field['before']['updated']['value'] if type(['before']['updated']) == dict else field['before']['updated'])
         @udf
         def customer_updater_type(field):
-            return (field['updater_type']['value'] if type(field['updater_type'])==dict else field['updater_type'])
+            if field['op'] != 'd':
+                return (field['after']['updater_type']['value'] if type(['after']['updater_type']) == dict else field['after']['updater_type'])
+            else:
+                return (field['before']['updater_type']['value'] if type(['before']['updater_type']) == dict else field['before']['updater_type'])
             
-        df = df.filter(df.after_payload.like('%id%'))## Safety Check: if id is present or not. If not then filter them out.
+        df = df.filter(col('payload').like('%id%'))## ID NEEDS TO BE THEIR otherwise it is a wrong input
         
         ############ Customer Fields #####################################
-        df = df.withColumn('id',customer_id(col('after_payload')).cast(StringType())) \
-        .withColumn('status',customer_status(col('after_payload')).cast(StringType())) \
-        .withColumn('status_metadata',customer_status_metadatafield(col('after_payload')).cast(StringType())) \
-        .withColumn('creator',customer_creator(col('after_payload')).cast(StringType())) \
-        .withColumn('created',customer_created(col('after_payload')).cast(TimestampType())) \
-        .withColumn('creator_type',customer_creator_type(col('after_payload')).cast(StringType())) \
-        .withColumn('updater',customer_updater(col('after_payload')).cast(StringType())) \
-        .withColumn('updated',customer_updated(col('after_payload')).cast(TimestampType())) \
-        .withColumn('updater_type',customer_updater_type(col('after_payload')).cast(StringType())).dropDuplicates()
+        df = df.withColumn('id',customer_id(col('payload')).cast(StringType())) \
+        .withColumn('status',customer_status(col('payload')).cast(StringType())) \
+        .withColumn('status_metadata',customer_status_metadatafield(col('payload')).cast(StringType())) \
+        .withColumn('creator',customer_creator(col('payload')).cast(StringType())) \
+        .withColumn('created',customer_created(col('payload')).cast(TimestampType())) \
+        .withColumn('creator_type',customer_creator_type(col('payload')).cast(StringType())) \
+        .withColumn('updater',customer_updater(col('payload')).cast(StringType())) \
+        .withColumn('updated',customer_updated(col('payload')).cast(TimestampType())) \
+        .withColumn('updater_type',customer_updater_type(col('payload')).cast(StringType())) \
+        .withColumn('time_event',col('ts_ms').cast(IntegerType())/1000)
         #####################################################################
-        df = df.drop('after_payload')
+
+        df = df.drop('payload','ts_ms') ## We don't need the payload column any longer
+
         return df

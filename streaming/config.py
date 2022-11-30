@@ -11,7 +11,17 @@ kafka_server = os.environ['KafkaServer']
 kafka_config = json.loads(os.environ['KafkaConsumerConfig'])
 topic_name = os.environ['TopicName']
 customer_table_config = json.loads(os.environ['CustomerTableConfig'])
-fact_hash_id_table_config = json.loads(os.environ['RawEventTableConfig'])
+customer_fields_map = {'id':'update_table.id',
+                        'status':'update_table.update',
+                        'status_metadata':'update_table.status_metadata',
+                        'creator':'update_table.creator',
+                        'created':'update_table.created',
+                        'creator_type':'update_table.creator_type',
+                        'updater':'update_table.updater',
+                        'updated':'update_table.updated',
+                        'updater_type':'update_table.updater_type',
+                        'time_event':'update_table.time_event'
+                        }
 hadoop_config={"fs.s3a.endpoint":s3endPointLoc,
                 "fs.s3a.access.key":s3accessKeyAws,
                 "fs.s3a.secret.key":s3secretKeyAws,

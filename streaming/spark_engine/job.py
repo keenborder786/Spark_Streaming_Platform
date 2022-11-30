@@ -41,7 +41,7 @@ class SparkJob:
             SparkSession.builder.appName(app_name)\
             .getOrCreate()
         )
-        # spark.sparkContext.setSystemProperty("com.amazonaws.services.s3.enableV4", "true")
+        spark.sparkContext.setSystemProperty("com.amazonaws.services.s3.enableV4", "true")
         spark.sparkContext.setLogLevel('Error')
            
         if hadoop_config != {}:
