@@ -63,7 +63,7 @@ def batch_function_customer_processing(micro_df:pyspark.sql.DataFrame, batch_id:
     .merge(latestChangesDF.alias("update_table").persist(StorageLevel.MEMORY_AND_DISK_DESER), "main_table.id = update_table.id") \
     .whenMatchedDelete(condition = "update_table.op = 'd'") \
     .whenMatchedUpdate(condition = "update_table.op != 'd'" , set  = customer_fields_map) \
-    .whenNotMatchedInsert(condition = "update_table.op != 'd'" , set = customer_fields_map) \
+    .whenNotMatchedInsert(condition = "update_table.op != 'd'" , values = customer_fields_map) \
     .execute()
 
 if __name__ == '__main__':
@@ -76,7 +76,7 @@ if __name__ == '__main__':
     
     #### Processing the raw_events coming from kafka. Extracting payload which contains the events for our table.
     raw_events = spark_processor.event_processing(df)
-    
+
     ##### Processing the customer data from payload.
     customer_update = spark_processor.customer_table_processing(raw_events)
 
@@ -84,7 +84,7 @@ if __name__ == '__main__':
     customer_table_deltalake_instance = DeltaLakeInteraction(spark_processor.spark_session, sourceBucket , 'DimCustomer')
     customer_table = customer_table_deltalake_instance.create_delta_table(customer_update.drop('time_event','op').schema, customer_table_config)
 
-    
+   
     ##### Updating the customer table data on delta lake from our new events
     final_streaming = customer_update.repartition(1).writeStream.foreachBatch(batch_function_customer_processing).outputMode("update") \
         .option("checkpointLocation", "s3a://{}/{}/_checkpoint".format(sourceBucket,'DimCustomer')) \

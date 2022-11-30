@@ -5,7 +5,44 @@ from kafka import KafkaProducer
 bootstrap_servers = ['172.18.0.4:9092']
 topicName = 'cdc_test_topics'
 producer = KafkaProducer(bootstrap_servers = bootstrap_servers)
-payloads = [r"""
+payloads = [
+    r"""
+    {"payload": {
+		"before": null,
+		"after": {
+			"id": {
+				"value": "c7392418-5e9a-4af4-8166-211e30b4de93",
+				"set": true
+			},
+			"status": null,
+			"status_metadata": null,
+			"creator": null,
+			"created": null,
+			"creator_type": null,
+			"updater": null,
+			"updated": null,
+			"updater_type": null
+		},
+		"source": {
+			"version": "1.7.0.13-BETA",
+			"connector": "yugabytedb",
+			"name": "dbserver1",
+			"ts_ms": -4258763232015,
+			"snapshot": "false",
+			"db": "yugabyte",
+			"sequence": "[\"0:0::0:0\",\"1:367::0:0\"]",
+			"schema": "public",
+			"table": "customer",
+			"txId": "",
+			"lsn": "1:367::0:0",
+			"xmin": null
+		},
+		"op": "c",
+		"ts_ms": 1669795724765,
+		"transaction": null
+	}}
+    """
+    ,r"""
 	{"payload": {
 		"before": {
 			"id": {
@@ -39,7 +76,7 @@ payloads = [r"""
 		"op": "d",
 		"ts_ms": 1669795724766,
 		"transaction": null
-	}
+	}}
 """,r"""
 	{"payload": {
 		"before": null,
@@ -89,7 +126,7 @@ payloads = [r"""
 		"op": "u",
 		"ts_ms": 1669795724772,
 		"transaction": null
-	}
+	}}
 """,
 r"""
 	{"payload": {
@@ -140,7 +177,7 @@ r"""
 		"op": "u",
 		"ts_ms": 1669795724772,
 		"transaction": null
-	}
+	}}
 """,
 r"""
 	{"payload": {
@@ -175,6 +212,45 @@ r"""
 		},
 		"op": "d",
 		"ts_ms": 1669795724772,
+		"transaction": null
+	}
+}
+""",
+
+r"""
+{
+	"payload": {
+		"before": null,
+		"after": {
+			"id": {
+				"value": "b67886f5-e64d-42a1-bf83-fcbbd5001d47",
+				"set": true
+			},
+			"status": null,
+			"status_metadata": null,
+			"creator": null,
+			"created": null,
+			"creator_type": null,
+			"updater": null,
+			"updated": null,
+			"updater_type": null
+		},
+		"source": {
+			"version": "1.7.0.13-BETA",
+			"connector": "yugabytedb",
+			"name": "dbserver1",
+			"ts_ms": -4258763692835,
+			"snapshot": "false",
+			"db": "yugabyte",
+			"sequence": "[\"0:0::0:0\",\"1:338::0:0\"]",
+			"schema": "public",
+			"table": "customer",
+			"txId": "",
+			"lsn": "1:338::0:0",
+			"xmin": null
+		},
+		"op": "u",
+		"ts_ms": 1669795724773,
 		"transaction": null
 	}
 }
@@ -217,6 +293,8 @@ r"""
 	}
 }
 
-"""]
+""",
+r"""{}""",
+r"""null"""]
 for payload in payloads:
-    producer.send('cdc_test_topics',payload.encode('utf-8')).get(timeout=10) 
+    producer.send('cdc_test_topics',payload.encode('utf-8')).get(timeout=10)
