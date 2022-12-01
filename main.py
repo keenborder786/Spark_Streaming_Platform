@@ -59,12 +59,13 @@ def batch_function_customer_processing(micro_df:pyspark.sql.DataFrame, batch_id:
         ## Delete the Row: If the latest event is of delete type & customer_id is in the delta table
         ## Update the Row: If the latest event is of not delete type & customer id is in the delta table 
         ## Insert the row: If the latest event is of not delete type & customer id is not in the delta table 
-    each_row_data = micro_df.orderBy('id','time_event').collect()
+    each_row_data = micro_df.orderBy('id','time_event').persist(StorageLevel.MEMORY_AND_DISK_DESER).collect()
+    
     for row in each_row_data:########## This might become a great bottleneck
         latestChangesDF = spark_processor.spark_session.createDataFrame([row],schema = customer_write_row_schema)## Need to convert each rowback to dataframe type
         customer_table \
         .alias("main_table") \
-        .merge(latestChangesDF.alias("update_table").persist(StorageLevel.MEMORY_AND_DISK_DESER), "main_table.id = update_table.id") \
+        .merge(latestChangesDF.alias("update_table"), "main_table.id = update_table.id") \
         .whenMatchedDelete(condition = "update_table.op = 'd'") \
         .whenMatchedUpdate(condition = "update_table.op != 'd'" , set  = customer_fields_map) \
         .whenNotMatchedInsert(condition = "update_table.op != 'd'" , values = customer_fields_map) \
@@ -91,7 +92,7 @@ if __name__ == '__main__':
 
    
     ##### Updating the customer table data on delta lake from our new events
-    final_streaming = customer_update.repartition(1).writeStream.foreachBatch(batch_function_customer_processing).outputMode("update") \
+    final_streaming = customer_update.writeStream.foreachBatch(batch_function_customer_processing).outputMode("update") \
         .option("checkpointLocation", "s3a://{}/{}/_checkpoint".format(sourceBucket,'DimCustomer')) \
         .start()
     spark_processor.spark_session.streams.awaitAnyTermination()

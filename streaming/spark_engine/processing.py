@@ -78,70 +78,96 @@ class SparkProcessing(SparkJob):
         ##### Customer Fields  Extraction Functions ###########
         @udf
         def customer_id(field):
-            
-            payload = field['payload']
-            if payload['op'] != 'd':## If operation is not of delete type then take the after payload
-                return (payload['after']['id']['value'] if type(payload['after']['id']) == dict else payload['after']['id'])
-            else:
-                return (payload['before']['id']['value'] if type(payload['before']['id']) == dict else payload['before']['id'])
-
+            try:
+                payload = field['payload']
+                if payload['op'] != 'd':## If operation is not of delete type then take the after payload
+                    return (payload['after']['id']['value'] if type(payload['after']['id']) == dict else payload['after']['id'])
+                else:
+                    return (payload['before']['id']['value'] if type(payload['before']['id']) == dict else payload['before']['id'])
+            except KeyError or TypeError:
+                ## Log this somewhere if Error is found
+                return 'Error'
         @udf
         def customer_status(field):
-            payload = field['payload']
-            if payload['op'] != 'd':## If operation is not of delete type then take the after payload
-                return (payload['after']['status']['value'] if type(payload['after']['status']) == dict else payload['after']['status'])
-            else:
-                return (payload['before']['status']['value'] if type(payload['before']['status']) == dict else payload['before']['status'])
+            try:
+                payload = field['payload']
+                if payload['op'] != 'd':## If operation is not of delete type then take the after payload
+                    return (payload['after']['status']['value'] if type(payload['after']['status']) == dict else payload['after']['status'])
+                else:
+                    return (payload['before']['status']['value'] if type(payload['before']['status']) == dict else payload['before']['status'])
+            except KeyError or TypeError:
+                return 'Error'
         @udf
         def customer_status_metadata(field):
-            payload = field['payload']
-            if payload['op'] != 'd':## If operation is not of delete type then take the after payload
-                return (payload['after']['status_metadata']['value'] if type(payload['after']['status_metadata']) == dict else payload['after']['status_metadata'])
-            else:
-                return (payload['before']['status_metadata']['value'] if type(payload['before']['status_metadata']) == dict else payload['before']['status_metadata'])
+            try:
+                payload = field['payload']
+                if payload['op'] != 'd':## If operation is not of delete type then take the after payload
+                    return (payload['after']['status_metadata']['value'] if type(payload['after']['status_metadata']) == dict else payload['after']['status_metadata'])
+                else:
+                    return (payload['before']['status_metadata']['value'] if type(payload['before']['status_metadata']) == dict else payload['before']['status_metadata'])
+            except KeyError or TypeError:
+                return 'Error'
         @udf
         def customer_creator(field):
-            payload = field['payload']
-            if payload['op'] != 'd':## If operation is not of delete type then take the after payload
-                return (payload['after']['creator']['value'] if type(payload['after']['creator']) == dict else payload['after']['creator'])
-            else:
-                return (payload['before']['creator']['value'] if type(payload['before']['creator']) == dict else payload['before']['creator'])
+            try:
+                payload = field['payload']
+                if payload['op'] != 'd':## If operation is not of delete type then take the after payload
+                    return (payload['after']['creator']['value'] if type(payload['after']['creator']) == dict else payload['after']['creator'])
+                else:
+                    return (payload['before']['creator']['value'] if type(payload['before']['creator']) == dict else payload['before']['creator'])
+            except KeyError or TypeError:
+                return 'Error'
         @udf
         def customer_created(field):
-            payload = field['payload']
-            if payload['op'] != 'd':## If operation is not of delete type then take the after payload
-                return (payload['after']['created']['value'] if type(payload['after']['created']) == dict else payload['after']['created'])
-            else:
-                return (payload['before']['created']['value'] if type(payload['before']['created']) == dict else payload['before']['created'])
+            try:
+                payload = field['payload']
+                if payload['op'] != 'd':## If operation is not of delete type then take the after payload
+                    return (payload['after']['created']['value'] if type(payload['after']['created']) == dict else payload['after']['created'])
+                else:
+                    return (payload['before']['created']['value'] if type(payload['before']['created']) == dict else payload['before']['created'])
+            except KeyError or TypeError:
+                return 'Error'
         @udf
         def customer_creator_type(field):
-            payload = field['payload']
-            if payload['op'] != 'd':## If operation is not of delete type then take the after payload
-                return (payload['after']['creator_type']['value'] if type(payload['after']['creator_type']) == dict else payload['after']['creator_type'])
-            else:
-                return (payload['before']['creator_type']['value'] if type(payload['before']['creator_type']) == dict else payload['before']['creator_type'])
+            try:
+                payload = field['payload']
+                if payload['op'] != 'd':## If operation is not of delete type then take the after payload
+                    return (payload['after']['creator_type']['value'] if type(payload['after']['creator_type']) == dict else payload['after']['creator_type'])
+                else:
+                    return (payload['before']['creator_type']['value'] if type(payload['before']['creator_type']) == dict else payload['before']['creator_type'])
+            except KeyError or TypeError:
+                return 'Error'
         @udf
         def customer_updater(field):
-            payload = field['payload']
-            if payload['op'] != 'd':## If operation is not of delete type then take the after payload
-                return (payload['after']['updater']['value'] if type(payload['after']['updater']) == dict else payload['after']['updater'])
-            else:
-                return (payload['before']['updater']['value'] if type(payload['before']['updater']) == dict else payload['before']['updater'])
+            try:
+                payload = field['payload']
+                if payload['op'] != 'd':## If operation is not of delete type then take the after payload
+                    return (payload['after']['updater']['value'] if type(payload['after']['updater']) == dict else payload['after']['updater'])
+                else:
+                    return (payload['before']['updater']['value'] if type(payload['before']['updater']) == dict else payload['before']['updater'])
+            except KeyError or TypeError:
+                return 'Error'
         @udf
         def customer_updated(field):
-            payload = field['payload']
-            if payload['op'] != 'd':## If operation is not of delete type then take the after payload
-                return (payload['after']['updated']['value'] if type(payload['after']['updated']) == dict else payload['after']['updated'])
-            else:
-                return (payload['before']['updated']['value'] if type(payload['before']['updated']) == dict else payload['before']['updated'])
+            try:
+                payload = field['payload']
+                if payload['op'] != 'd':## If operation is not of delete type then take the after payload
+                    return (payload['after']['updated']['value'] if type(payload['after']['updated']) == dict else payload['after']['updated'])
+                else:
+                    return (payload['before']['updated']['value'] if type(payload['before']['updated']) == dict else payload['before']['updated'])
+            except KeyError or TypeError:
+                return 'Error'
         @udf
         def customer_updater_type(field):
-            payload = field['payload']
-            if payload['op'] != 'd':## If operation is not of delete type then take the after payload
-                return (payload['after']['updater_type']['value'] if type(payload['after']['updater_type']) == dict else payload['after']['updater_type'])
-            else:
-                return (payload['before']['updater_type']['value'] if type(payload['before']['updater_type']) == dict else payload['before']['updater_type'])
-            
+            try:
+                payload = field['payload']
+                if payload['op'] != 'd':## If operation is not of delete type then take the after payload
+                    return (payload['after']['updater_type']['value'] if type(payload['after']['updater_type']) == dict else payload['after']['updater_type'])
+                else:
+                    return (payload['before']['updater_type']['value'] if type(payload['before']['updater_type']) == dict else payload['before']['updater_type'])
+            except KeyError or TypeError:
+                return 'Error'
+                
        
         
         ############ Customer Fields #######################################################
