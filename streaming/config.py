@@ -11,6 +11,17 @@ kafka_server = os.environ['KafkaServer']
 kafka_config = json.loads(os.environ['KafkaConsumerConfig'])
 topic_name = os.environ['TopicName']
 customer_table_config = json.loads(os.environ['CustomerTableConfig'])
+customer_write_row_schema = StructType([StructField('time_event', FloatType(), True),
+                              StructField('op',StringType(),True),
+                              StructField('id', StringType(), True), 
+                              StructField('status', StringType(), True), 
+                              StructField('status_metadata', StringType(), True), 
+                              StructField('creator', StringType(), True), 
+                              StructField('created', TimestampType(), True), 
+                              StructField('creator_type', StringType(), True), 
+                              StructField('updater', StringType(), True), 
+                              StructField('updated', TimestampType(), True), 
+                              StructField('updater_type', StringType(), True)])
 customer_fields_map = {'id':'update_table.id',
                         'status':'update_table.status',
                         'status_metadata':'update_table.status_metadata',

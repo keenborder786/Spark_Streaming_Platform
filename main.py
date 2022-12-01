@@ -11,7 +11,6 @@ from pyspark.sql.types import *
 from pyspark.sql.functions import * 
 from streaming.spark_engine import SparkProcessing
 from streaming.deltalake_engine import DeltaLakeInteraction
-from pyspark.sql import Window
 
 from streaming.config import (
                     hadoop_config,
@@ -20,7 +19,8 @@ from streaming.config import (
                     sourceBucket,
                     kafka_config,
                     customer_table_config,
-                    customer_fields_map)
+                    customer_fields_map,
+                    customer_write_row_schema)
 
 def batch_function_backup_table(micro_df:pyspark.sql.DataFrame, batch_id:int):
     """
@@ -52,19 +52,23 @@ def batch_function_customer_processing(micro_df:pyspark.sql.DataFrame, batch_id:
     ## Take the latest changes per id. 
     ## So the logic here is that in streaming a single micro df might have events related to the same customer id and we only need to take the latest
     ## changes.
-    latestChangesDF = micro_df.withColumn("row_num", row_number().over(Window.partitionBy("id").orderBy(col("time_event").desc()))).where("row_num == 1")
+    # latestChangesDF = micro_df.withColumn("row_num", row_number().over(Window.partitionBy("id").orderBy(col("time_event").desc()))).where("row_num == 1")
     
+
     ## Operations
         ## Delete the Row: If the latest event is of delete type & customer_id is in the delta table
         ## Update the Row: If the latest event is of not delete type & customer id is in the delta table 
         ## Insert the row: If the latest event is of not delete type & customer id is not in the delta table 
-    customer_table \
-    .alias("main_table") \
-    .merge(latestChangesDF.alias("update_table").persist(StorageLevel.MEMORY_AND_DISK_DESER), "main_table.id = update_table.id") \
-    .whenMatchedDelete(condition = "update_table.op = 'd'") \
-    .whenMatchedUpdate(condition = "update_table.op != 'd'" , set  = customer_fields_map) \
-    .whenNotMatchedInsert(condition = "update_table.op != 'd'" , values = customer_fields_map) \
-    .execute()
+    each_row_data = micro_df.orderBy('id','time_event').collect()
+    for row in each_row_data:########## This might become a great bottleneck
+        latestChangesDF = spark_processor.spark_session.createDataFrame([row],schema = customer_write_row_schema)## Need to convert each rowback to dataframe type
+        customer_table \
+        .alias("main_table") \
+        .merge(latestChangesDF.alias("update_table").persist(StorageLevel.MEMORY_AND_DISK_DESER), "main_table.id = update_table.id") \
+        .whenMatchedDelete(condition = "update_table.op = 'd'") \
+        .whenMatchedUpdate(condition = "update_table.op != 'd'" , set  = customer_fields_map) \
+        .whenNotMatchedInsert(condition = "update_table.op != 'd'" , values = customer_fields_map) \
+        .execute()
 
 if __name__ == '__main__':
 
