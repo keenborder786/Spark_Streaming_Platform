@@ -10,13 +10,7 @@ from streaming.deltalake_engine import DeltaLakeInteraction
 from pyspark.sql import SparkSession
 from streaming.config import (
                     hadoop_config,
-                    kafka_server,
-                    topic_name,
-                    sourceBucket,
-                    kafka_config,
-                    customer_table_config,
-                    customer_fields_map,
-                    customer_write_row_schema)
+                    sourceBucket)
 
 if __name__ == '__main__':
 
@@ -40,4 +34,4 @@ if __name__ == '__main__':
         for k,v in hadoop_config.items():
             spark.sparkContext._jsc.hadoopConfiguration().set(k, v)
     customer_table_deltalake_instance = DeltaLakeInteraction(spark, sourceBucket , 'DimCustomer')
-    customer_table_deltalake_instance.query_latest_table().write.csv('temp')
+    customer_table_deltalake_instance.query_latest_table().show()

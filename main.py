@@ -19,18 +19,13 @@ from streaming.config import (
                     sourceBucket,
                     kafka_config,
                     customer_table_config,
+                    customer_write_schema,
                     customer_fields_map,
-                    customer_write_row_schema)
+                    customer_cdc_delta_schema,
+                    debeziumCustomerEventSchema)
 
-def batch_function_backup_table(micro_df:pyspark.sql.DataFrame, batch_id:int):
-    """
 
-    This function writes raw_payload packages to a table for backup purposes
-    
-    """
-    pass
-
-def batch_function_customer_processing(micro_df:pyspark.sql.DataFrame, batch_id:int):
+def batch_function_customer_processing(micro_df:pyspark.sql.DataFrame , batch_id:int):
     """
     This function updates, deletes and inserts the customer data from the CDC payload
     After every 100 batches, we run the optimize command to compact the parquet files created by delta lake
@@ -48,21 +43,16 @@ def batch_function_customer_processing(micro_df:pyspark.sql.DataFrame, batch_id:
     if batch_id % 100 == 0:## Compact the files into one file after every 10 batch & delete the files greater than the retention period not needed by delta lake 
         customer_table.optimize().executeCompaction()
     
-    
-    ## Take the latest changes per id. 
-    ## So the logic here is that in streaming a single micro df might have events related to the same customer id and we only need to take the latest
-    ## changes.
-    # latestChangesDF = micro_df.withColumn("row_num", row_number().over(Window.partitionBy("id").orderBy(col("time_event").desc()))).where("row_num == 1")
-    
+
 
     ## Operations
         ## Delete the Row: If the latest event is of delete type & customer_id is in the delta table
         ## Update the Row: If the latest event is of not delete type & customer id is in the delta table 
         ## Insert the row: If the latest event is of not delete type & customer id is not in the delta table 
     each_row_data = micro_df.orderBy('id','time_event').persist(StorageLevel.MEMORY_AND_DISK_DESER).collect()
-    
-    for row in each_row_data:########## This might become a great bottleneck
-        latestChangesDF = spark_processor.spark_session.createDataFrame([row],schema = customer_write_row_schema)## Need to convert each rowback to dataframe type
+    for row in each_row_data:##########  Iterating over each event and updating the delta lake table. This is needed to keep track of all events.
+        latestChangesDF = spark_processor.spark_session.createDataFrame([row],schema = customer_cdc_delta_schema)## Need to convert each rowback to dataframe type
+        
         customer_table \
         .alias("main_table") \
         .merge(latestChangesDF.alias("update_table"), "main_table.id = update_table.id") \
@@ -72,7 +62,6 @@ def batch_function_customer_processing(micro_df:pyspark.sql.DataFrame, batch_id:
         .execute()
 
 if __name__ == '__main__':
-
     #Setting up the spark session
     spark_processor = SparkProcessing('kafka_delta' ,hadoop_config)
     
@@ -81,19 +70,16 @@ if __name__ == '__main__':
     
     #### Processing the raw_events coming from kafka. Extracting payload which contains the events for our table.
     raw_events = spark_processor.event_processing(df)
-
-    ##### Processing the customer data from payload.
-    customer_update = spark_processor.customer_table_processing(raw_events)
-
-    #### Create the customer table if it does not exists
-    customer_table_deltalake_instance = DeltaLakeInteraction(spark_processor.spark_session, sourceBucket , 'DimCustomer')
-    customer_table = customer_table_deltalake_instance.create_delta_table(customer_update.drop('time_event','op').schema, customer_table_config)
-
-
    
-    ##### Updating the customer table data on delta lake from our new events
+    ##### Processing the customer data from payload.
+    customer_update = spark_processor.table_processing(raw_events , debeziumCustomerEventSchema , customer_write_schema)
+
+    ###### Create the customer table if it does not exists
+    customer_table_deltalake_instance = DeltaLakeInteraction(spark_processor.spark_session, sourceBucket , 'DimCustomer')
+    customer_table = customer_table_deltalake_instance.create_delta_table(customer_write_schema , customer_table_config)
+
+    # # ###### Updating the customer table data on delta lake from our new events
     final_streaming = customer_update.writeStream.foreachBatch(batch_function_customer_processing).outputMode("update") \
-        .option("checkpointLocation", "s3a://{}/{}/_checkpoint".format(sourceBucket,'DimCustomer')) \
         .start()
     spark_processor.spark_session.streams.awaitAnyTermination()
 
