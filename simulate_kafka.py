@@ -291,6 +291,91 @@ r"""
 	}
 }
 """,
+r"""
+{
+	"payload": {
+		"before": null,
+		"after": {
+			"id": {
+				"value": "MK213141",
+				"set": true
+			},
+			"status": null,
+			"status_metadata": null,
+			"creator": null,
+			"created": null,
+			"creator_type": null,
+			"updater": null,
+			"updated": null,
+			"updater_type": null
+		},
+		"source": {
+			"version": "1.7.0.13-BETA",
+			"connector": "yugabytedb",
+			"name": "dbserver1",
+			"ts_ms": -4258763692835,
+			"snapshot": "false",
+			"db": "yugabyte",
+			"sequence": "[\"0:0::0:0\",\"1:338::0:0\"]",
+			"schema": "public",
+			"table": "customer",
+			"txId": "",
+			"lsn": "1:338::0:0",
+			"xmin": null
+		},
+		"op": "c",
+		"ts_ms": 1669795724779,
+		"transaction": null
+	}
+}
+""",
+r"""
+{
+	"payload": {
+		"before": null,
+		"after": {
+			"id": {
+				"value": "MK213141",
+				"set": true
+			},
+			"status": {
+				"value": "status_update",
+				"set": true
+			},
+			"status_metadata": {
+				"value": "status_metadata",
+				"set": true
+			},
+			"creator": {
+				"value": "creator",
+				"set": true
+			},
+			"created": null,
+			"creator_type": null,
+			"updater": null,
+			"updated": null,
+			"updater_type": null
+		},
+		"source": {
+			"version": "1.7.0.13-BETA",
+			"connector": "yugabytedb",
+			"name": "dbserver1",
+			"ts_ms": -4258763692835,
+			"snapshot": "false",
+			"db": "yugabyte",
+			"sequence": "[\"0:0::0:0\",\"1:338::0:0\"]",
+			"schema": "public",
+			"table": "customer",
+			"txId": "",
+			"lsn": "1:338::0:0",
+			"xmin": null
+		},
+		"op": "u",
+		"ts_ms": 1669795724779,
+		"transaction": null
+	}
+}
+""",
 r"""{}""",
 r"""null""",
 r"""{"schema":{"type":"struct","fields":[{"type":"struct","fields":[{"type":"struct","fields":[{"type":"string","optional":false,"name":"io.debezium.data.Uuid","version":1,"field":"value"},{"type":"boolean","optional":false,"field":"set"}],"optional":false,"name":"id","field":"id"},{"type":"struct","fields":[{"type":"string","optional":true,"field":"value"},{"type":"boolean","optional":false,"field":"set"}],"optional":true,"name":"status","field":"status"},{"type":"struct","fields":[{"type":"string","optional":true,"field":"value"},{"type":"boolean","optional":false,"field":"set"}],"optional":true,"name":"status_metadata","field":"status_metadata"},{"type":"struct","fields":[{"type":"string","optional":true,"name":"io.debezium.data.Uuid","version":1,"field":"value"},{"type":"boolean","optional":false,"field":"set"}],"optional":true,"name":"creator","field":"creator"},{"type":"struct","fields":[{"type":"int64","optional":true,"name":"io.debezium.time.Timestamp","version":1,"field":"value"},{"type":"boolean","optional":false,"field":"set"}],"optional":true,"name":"created","field":"created"},{"type":"struct","fields":[{"type":"string","optional":true,"field":"value"},{"type":"boolean","optional":false,"field":"set"}],"optional":true,"name":"creator_type","field":"creator_type"},{"type":"struct","fields":[{"type":"string","optional":true,"name":"io.debezium.data.Uuid","version":1,"field":"value"},{"type":"boolean","optional":false,"field":"set"}],"optional":true,"name":"updater","field":"updater"},{"type":"struct","fields":[{"type":"int64","optional":true,"name":"io.debezium.time.Timestamp","version":1,"field":"value"},{"type":"boolean","optional":false,"field":"set"}],"optional":true,"name":"updated","field":"updated"},{"type":"struct","fields":[{"type":"string","optional":true,"field":"value"},{"type":"boolean","optional":false,"field":"set"}],"optional":true,"name":"updater_type","field":"updater_type"}],"optional":true,"name":"dbserver1.public.customer.Value","field":"before"},{"type":"struct","fields":[{"type":"struct","fields":[{"type":"string","optional":false,"name":"io.debezium.data.Uuid","version":1,"field":"value"},{"type":"boolean","optional":false,"field":"set"}],"optional":false,"name":"id","field":"id"},{"type":"struct","fields":[{"type":"string","optional":true,"field":"value"},{"type":"boolean","optional":false,"field":"set"}],"optional":true,"name":"status","field":"status"},{"type":"struct","fields":[{"type":"string","optional":true,"field":"value"},{"type":"boolean","optional":false,"field":"set"}],"optional":true,"name":"status_metadata","field":"status_metadata"},{"type":"struct","fields":[{"type":"string","optional":true,"name":"io.debezium.data.Uuid","version":1,"field":"value"},{"type":"boolean","optional":false,"field":"set"}],"optional":true,"name":"creator","field":"creator"},{"type":"struct","fields":[{"type":"int64","optional":true,"name":"io.debezium.time.Timestamp","version":1,"field":"value"},{"type":"boolean","optional":false,"field":"set"}],"optional":true,"name":"created","field":"created"},{"type":"struct","fields":[{"type":"string","optional":true,"field":"value"},{"type":"boolean","optional":false,"field":"set"}],"optional":true,"name":"creator_type","field":"creator_type"},{"type":"struct","fields":[{"type":"string","optional":true,"name":"io.debezium.data.Uuid","version":1,"field":"value"},{"type":"boolean","optional":false,"field":"set"}],"optional":true,"name":"updater","field":"updater"},{"type":"struct","fields":[{"type":"int64","optional":true,"name":"io.debezium.time.Timestamp","version":1,"field":"value"},{"type":"boolean","optional":false,"field":"set"}],"optional":true,"name":"updated","field":"updated"},{"type":"struct","fields":[{"type":"string","optional":true,"field":"value"},{"type":"boolean","optional":false,"field":"set"}],"optional":true,"name":"updater_type","field":"updater_type"}],"optional":true,"name":"dbserver1.public.customer.Value","field":"after"},{"type":"struct","fields":[{"type":"string","optional":false,"field":"version"},{"type":"string","optional":false,"field":"connector"},{"type":"string","optional":false,"field":"name"},{"type":"int64","optional":false,"field":"ts_ms"},{"type":"string","optional":true,"name":"io.debezium.data.Enum","version":1,"parameters":{"allowed":"true,last,false"},"default":"false","field":"snapshot"},{"type":"string","optional":false,"field":"db"},{"type":"string","optional":true,"field":"sequence"},{"type":"string","optional":false,"field":"schema"},{"type":"string","optional":false,"field":"table"},{"type":"string","optional":true,"field":"txId"},{"type":"string","optional":true,"field":"lsn"},{"type":"int64","optional":true,"field":"xmin"}],"optional":false,"name":"io.debezium.connector.postgresql.Source","field":"source"},{"type":"string","optional":false,"field":"op"},{"type":"int64","optional":true,"field":"ts_ms"},{"type":"struct","fields":[{"type":"string","optional":false,"field":"id"},{"type":"int64","optional":false,"field":"total_order"},{"type":"int64","optional":false,"field":"data_collection_order"}],"optional":true,"field":"transaction"}],"optional":false,"name":"dbserver1.public.customer.Envelope"},"payload":{"before":{"id":{"value":"99923492-6026-45a4-b89c-32d4dde8ccb1","set":true},"status":null,"status_metadata":null,"creator":null,"created":null,"creator_type":null,"updater":null,"updated":null,"updater_type":null},"after":null,"source":{"version":"1.7.0.13-BETA","connector":"yugabytedb","name":"dbserver1","ts_ms":-4616124018684,"snapshot":"false","db":"yugabyte","sequence":"[null,\"4:36::0:0\"]","schema":"public","table":"customer","txId":"","lsn":"4:36::0:0","xmin":null},"op":"d","ts_ms":1669708957938,"transaction":null}}""",
