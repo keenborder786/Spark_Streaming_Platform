@@ -9,9 +9,7 @@ services:
       - '2181:2181'
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
-    networks:
-      datapipeline:
-        ipv4_address: 172.18.0.3
+
   kafka:
     image: 'bitnami/kafka:latest'
     container_name: kafka
@@ -20,15 +18,13 @@ services:
       - '9092:9092'
     environment:
       - KAFKA_BROKER_ID=1
-      - KAFKA_CFG_LISTENERS=PLAINTEXT://172.18.0.4:9092
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://172.18.0.4:9092
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://127.0.0.1:9092
       - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
       - ALLOW_PLAINTEXT_LISTENER=yes
     depends_on:
       - zookeeper
-    networks:
-      datapipeline:
-        ipv4_address: 172.18.0.4
+
   minio:
     image: quay.io/minio/minio
     container_name: minio
@@ -39,15 +35,11 @@ services:
     volumes:
       - minio_storage:/data
     environment:
-      MINIO_ACCESS_KEY_FILE: /run/secrets/minio_user
-      MINIO_SECRET_KEY_FILE: /run/secrets/minio_password
-    secrets:
-      - minio_user
-      - minio_password
+      MINIO_ACCESS_KEY_FILE: user
+      MINIO_SECRET_KEY_FILE: password
+
     command: server /data --console-address ":9090"
-    networks:
-      datapipeline:
-        ipv4_address: 172.18.0.5
+
   sparkmaster:
     image: sparkmaster:1.0
     container_name: sparkmaster
@@ -62,15 +54,13 @@ services:
     depends_on:
       - kafka
       - minio
-    networks:
-      datapipeline:
-        ipv4_address: 172.18.0.6
+
   sparkworker:
     image: sparkworker:1.0
     container_name: sparkworker
     hostname: sparkworker
     environment:
-      MASTER_HOST_NAME: spark://172.18.0.6:7077
+      MASTER_HOST_NAME: spark://localhost:7077
       WORKER_MEMORY: 1G
     tty: true
     ports:
@@ -80,9 +70,7 @@ services:
       - spark_cache:/root/.ivy2/cache
     depends_on:
       - sparkmaster
-    networks:
-      datapipeline:
-        ipv4_address: 172.18.0.7
+
   sparkclient:
     image: sparkclient:1.0
     container_name: sparkclient
@@ -96,27 +84,12 @@ services:
       - spark_cache:/root/.ivy2/cache
     env_file:
       - .env
-    networks:
-      datapipeline:
-        ipv4_address: 172.18.0.8
         
 
 
-secrets:
-  minio_user:
-    file: ./secrets/minio_user.txt
-  minio_password:
-    file: ./secrets/minio_password.txt
+
 
 volumes:
   minio_storage:  {}
   spark_packages: {}
   spark_cache:    {}
-
-networks:
-    datapipeline:
-        driver: bridge
-        ipam:
-            driver: default
-            config:
-                - subnet: "172.18.0.0/16"

@@ -1,0 +1,16 @@
+apiVersion: v1
+data:
+  CustomerTableConfig: '{"delta.appendOnly":"false","delta.enableChangeDataFeed":"true","delta.deletedFileRetentionDuration":"interval 7 days"}'
+  KafkaConsumerConfig: '{"failOnDataLoss":"false"}'
+  KafkaServer: 10.10.0.1:9092
+  S3EndPoint: 10.10.0.2:9000
+  S3Password: password
+  S3USER: user
+  SourceBucket: test
+  TopicName: cdc_test_topics
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: sparkclient-env
+  name: env

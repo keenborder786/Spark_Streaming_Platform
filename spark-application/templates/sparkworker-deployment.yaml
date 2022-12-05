@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -c
+    kompose.version: 1.27.0 (b0ed6a2c9)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: sparkworker
+  name: sparkworker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: sparkworker
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -c
+        kompose.version: 1.27.0 (b0ed6a2c9)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: sparkworker
+    spec:
+      containers:
+        - env:
+            - name: MASTER_HOST_NAME
+              value: spark://10.10.0.4:7077
+            - name: WORKER_MEMORY
+              value: 1G
+          image: sparkworker:1.0
+          name: sparkworker
+          ports:
+            - containerPort: 8081
+          resources: {}
+          tty: true
+          volumeMounts:
+            - mountPath: /root/.ivy2/jars
+              name: spark-packages
+            - mountPath: /root/.ivy2/cache
+              name: spark-cache
+      hostname: sparkworker
+      restartPolicy: Always
+      volumes:
+        - name: spark-packages
+          persistentVolumeClaim:
+            claimName: spark-packages
+        - name: spark-cache
+          persistentVolumeClaim:
+            claimName: spark-cache
+status: {}

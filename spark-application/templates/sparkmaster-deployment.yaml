@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -c
+    kompose.version: 1.27.0 (b0ed6a2c9)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: sparkmaster
+  name: sparkmaster
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: sparkmaster
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -c
+        kompose.version: 1.27.0 (b0ed6a2c9)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: sparkmaster
+    spec:
+      containers:
+        - image: sparkmaster:1.0
+          name: sparkmaster
+          ports:
+            - containerPort: 8080
+            - containerPort: 7077
+          resources: {}
+          tty: true
+          volumeMounts:
+            - mountPath: /root/.ivy2/jars
+              name: spark-packages
+            - mountPath: /root/.ivy2/cache
+              name: spark-cache
+      hostname: sparkmaster
+      restartPolicy: Always
+      volumes:
+        - name: spark-packages
+          persistentVolumeClaim:
+            claimName: spark-packages
+        - name: spark-cache
+          persistentVolumeClaim:
+            claimName: spark-cache
+status: {}

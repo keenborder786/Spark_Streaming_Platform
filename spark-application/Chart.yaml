@@ -1,0 +1,11 @@
+name: docker-compose
+description: A generated Helm Chart for Spark Pipeline (Kafka CDC to Delta Lake)
+version: 0.0.1
+apiVersion: v1
+keywords:
+  - docker-compose
+  - kafka
+  - minio
+  - spark
+sources:
+home:

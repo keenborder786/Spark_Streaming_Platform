@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -c
+    kompose.version: 1.27.0 (b0ed6a2c9)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: sparkclient
+  name: sparkclient
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: sparkclient
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -c
+        kompose.version: 1.27.0 (b0ed6a2c9)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: sparkclient
+    spec:
+      containers:
+        - env:
+            - name: CustomerTableConfig
+              valueFrom:
+                configMapKeyRef:
+                  key: CustomerTableConfig
+                  name: env
+            - name: KafkaConsumerConfig
+              valueFrom:
+                configMapKeyRef:
+                  key: KafkaConsumerConfig
+                  name: env
+            - name: KafkaServer
+              valueFrom:
+                configMapKeyRef:
+                  key: KafkaServer
+                  name: env
+            - name: S3EndPoint
+              valueFrom:
+                configMapKeyRef:
+                  key: S3EndPoint
+                  name: env
+            - name: S3Password
+              valueFrom:
+                configMapKeyRef:
+                  key: S3Password
+                  name: env
+            - name: S3USER
+              valueFrom:
+                configMapKeyRef:
+                  key: S3USER
+                  name: env
+            - name: SourceBucket
+              valueFrom:
+                configMapKeyRef:
+                  key: SourceBucket
+                  name: env
+            - name: TopicName
+              valueFrom:
+                configMapKeyRef:
+                  key: TopicName
+                  name: env
+            - name: MASTER_HOST_NAME
+              value: spark://10.10.0.4:7077
+            - name: DRIVER_BINDADDRESS
+              value: 10.10.0.3
+            - name: DRIVER_HOST
+              value: sparkclient
+          image: sparkclient:1.0
+          name: sparkclient
+          ports:
+            - containerPort: 4040
+          resources: {}
+          volumeMounts:
+            - mountPath: /root/.ivy2/jars
+              name: spark-packages
+            - mountPath: /root/.ivy2/cache
+              name: spark-cache
+      hostname: sparkclient
+      restartPolicy: Always
+      volumes:
+        - name: spark-packages
+          persistentVolumeClaim:
+            claimName: spark-packages
+        - name: spark-cache
+          persistentVolumeClaim:
+            claimName: spark-cache
+status: {}
