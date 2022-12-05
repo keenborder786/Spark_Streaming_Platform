@@ -36,7 +36,8 @@ def batch_function_processing(micro_df:pyspark.sql.DataFrame , batch_id:int ,
     if batch_id % 100 == 0:## Compact the files into one file after every 10 batch & delete the files greater than the retention period not needed by delta lake 
         delta_lake_builder.optimize().executeCompaction()
     
-
+    ## Latest Window Approach
+    #latestChangesDF = micro_df.withColumn("row_num", row_number().over(Window.partitionBy("id").orderBy(col("time_event").desc()))).where("row_num == 1")
 
     ## Operations
         ## Delete the Row: If the latest event is of delete type & customer_id is in the delta table
