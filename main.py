@@ -28,7 +28,7 @@ if __name__ == '__main__':
     spark_processor = SparkProcessing('kafka_delta' ,hadoop_config)
     
     #Reading kafka stream
-    df = spark_processor.read_kafka_stream(kafka_server, topic_name, 'latest',kafka_config)
+    df = spark_processor.read_kafka_stream(kafka_server, topic_name, 'latest', kafka_config)
     
     #### Processing the raw_events coming from kafka. Extracting payload which contains the events for our table.
     raw_events = spark_processor.event_processing(df)
@@ -42,7 +42,8 @@ if __name__ == '__main__':
 
     # # ###### Updating the customer table data on delta lake from our new events
     final_streaming = customer_update.writeStream.foreachBatch(lambda micro_df,epochId: batch_function_processing(micro_df, epochId, 
-        spark_processor,customer_table,customer_cdc_delta_schema , customer_fields_map)).outputMode("update") \
+        spark_processor,customer_table,customer_cdc_delta_schema , customer_fields_map)).option("checkpointLocation", "s3a://{}/{}/_checkpoint".format(sourceBucket,'DimCustomer')) \
+        .outputMode("update") \
         .start()
     spark_processor.spark_session.streams.awaitAnyTermination()
 
