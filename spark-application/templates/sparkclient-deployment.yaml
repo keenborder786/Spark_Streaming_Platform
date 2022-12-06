@@ -1,28 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -c
-    kompose.version: 1.27.0 (b0ed6a2c9)
-  creationTimestamp: null
   labels:
-    io.kompose.service: sparkclient
+    app: sparkclient
   name: sparkclient
 spec:
   replicas: 1
   selector:
     matchLabels:
-      io.kompose.service: sparkclient
+      app: sparkclient
   strategy:
     type: Recreate
   template:
     metadata:
-      annotations:
-        kompose.cmd: kompose convert -c
-        kompose.version: 1.27.0 (b0ed6a2c9)
-      creationTimestamp: null
       labels:
-        io.kompose.service: sparkclient
+        app: sparkclient
     spec:
       containers:
         - env:
@@ -67,16 +59,15 @@ spec:
                   key: TopicName
                   name: env
             - name: MASTER_HOST_NAME
-              value: spark://10.10.0.4:7077
+              value: spark://10.97.0.4:7077
             - name: DRIVER_BINDADDRESS
-              value: 10.10.0.3
+              value: 10.97.0.6
             - name: DRIVER_HOST
               value: sparkclient
           image: sparkclient:1.0
           name: sparkclient
           ports:
             - containerPort: 4040
-          resources: {}
           volumeMounts:
             - mountPath: /root/.ivy2/jars
               name: spark-packages
@@ -91,4 +82,3 @@ spec:
         - name: spark-cache
           persistentVolumeClaim:
             claimName: spark-cache
-status: {}

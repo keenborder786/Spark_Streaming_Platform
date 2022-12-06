@@ -3,7 +3,7 @@ kind: PersistentVolumeClaim
 metadata:
   creationTimestamp: null
   labels:
-    io.kompose.service: spark-packages
+    app: spark-packages
   name: spark-packages
 spec:
   accessModes:
@@ -11,4 +11,3 @@ spec:
   resources:
     requests:
       storage: 100Mi
-status: {}
