@@ -38,7 +38,7 @@ These commands deploy Spark on the Kubernetes cluster in the default configurati
 
 ## Uninstalling the Chart
 
-To uninstall/delete the `my-release` deployment:
+To uninstall/delete the `spark-application` deployment:
 
 ```console
 helm delete spark-application
