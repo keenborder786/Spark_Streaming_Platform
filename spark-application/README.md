@@ -1,1 +1,1 @@
-This chart has been created for a developemental kafka cluster.
+# Spark Application Helm Chart

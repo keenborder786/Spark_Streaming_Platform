@@ -60,20 +60,29 @@ spec:
                   name: env
             - name: MASTER_HOST_NAME
               value: spark://10.97.0.4:7077
-            - name: DRIVER_BINDADDRESS
-              value: 10.97.0.6
-            - name: DRIVER_HOST
-              value: sparkclient
+            - name: "SPARK_LOCAL_IP"
+              valueFrom:
+                fieldRef:
+                  apiVersion: "v1"
+                  fieldPath: "status.podIP"
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "250m"
+            limits:
+              memory: "3Gi"
+              cpu: "2000m"
           image: sparkclient:1.0
           name: sparkclient
           ports:
             - containerPort: 4040
+            - containerPort: 4000
           volumeMounts:
             - mountPath: /root/.ivy2/jars
               name: spark-packages
             - mountPath: /root/.ivy2/cache
               name: spark-cache
-      hostname: sparkclient
+      hostname: sparkclient-service
       restartPolicy: Always
       volumes:
         - name: spark-packages

@@ -5,7 +5,7 @@ metadata:
 data:
   CustomerTableConfig: '{"delta.appendOnly":"false","delta.enableChangeDataFeed":"true","delta.deletedFileRetentionDuration":"interval 7 days"}'
   KafkaConsumerConfig: '{"failOnDataLoss":"false"}'
-  KafkaServer: 10.97.0.1:9092
+  KafkaServer: my-release-kafka.default.svc.cluster.local:9092
   S3EndPoint: 10.97.0.3:9000
   S3Password: password
   S3USER: user

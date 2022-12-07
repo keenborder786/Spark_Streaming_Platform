@@ -38,7 +38,7 @@ class SparkJob:
         """
         
         spark = (
-            SparkSession.builder.appName(app_name)\
+            SparkSession.builder.appName(app_name)  \
             .getOrCreate()
         )
         spark.sparkContext.setSystemProperty("com.amazonaws.services.s3.enableV4", "true")
