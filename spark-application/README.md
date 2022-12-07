@@ -8,11 +8,10 @@ This chart bootstraps our Spark Application deployment (Streaming Job Processing
 
 ## Prerequisites
 
-- Spark 3.3.1
-- Hadoop 3
-
+- K8 cluster
+- Kafka Cluster
+- S3 Bucket
 - Helm 3.2.0+
-- PV provisioner support in the underlying infrastructure
 
 ## Installing the Chart
 
