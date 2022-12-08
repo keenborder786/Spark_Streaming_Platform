@@ -42,8 +42,20 @@ To uninstall/delete the `spark-application` deployment:
 ```console
 helm delete spark-application
 ```
-
 The command removes all the Spark Application components associated with the chart and deletes the release.
+
+
+## Only for Dev Purposes:
+
+If you want to test run the spark job then follow the given step:
+
+- Step-0: Set up minikube cluster by following the [instruction] (https://minikube.sigs.k8s.io/docs/start/)
+- Step-1: Install [Helm](https://helm.sh/docs/intro/install/)  
+- Step-2: Install kafka cluster chart by [bitnami](https://github.com/bitnami/charts/tree/main/bitnami/kafka) and deploy on minikube with default values.
+- Step-3: Set up minio chart provided [here](https://github.com/keenborder786/poc_kafka_delta/tree/helm_testing/minio) and deploy on minikube.
+- Step-4: Build all of the images for all the docker files from [here](https://github.com/keenborder786/poc_kafka_delta/tree/helm_testing)
+- Step-5: Now run the spark helm chart and deploy on minikube with default values.
+
 
 ## Parameters
 
