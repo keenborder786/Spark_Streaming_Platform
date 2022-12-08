@@ -29,22 +29,21 @@ if __name__ == '__main__':
     
     #Reading kafka stream
     df = spark_processor.read_kafka_stream(kafka_server, topic_name, 'latest', kafka_config)
-    df.writeStream.format('console').outputMode("append").start()
-
-    # #### Processing the raw_events coming from kafka. Extracting payload which contains the events for our table.
-    # raw_events = spark_processor.event_processing(df)
-   
-    # ##### Processing the customer data from payload.
-    # customer_update = spark_processor.table_processing(raw_events , debeziumCustomerEventSchema , customer_write_schema)
     
-    # # ###### Create the customer table if it does not exists
-    # customer_table_deltalake_instance = DeltaLakeInteraction(spark_processor.spark_session, sourceBucket , 'DimCustomer')
-    # customer_table = customer_table_deltalake_instance.create_delta_table(customer_write_schema , customer_table_config)
+    # #### Processing the raw_events coming from kafka. Extracting payload which contains the events for our table.
+    raw_events = spark_processor.event_processing(df)
+    
+    # ##### Processing the customer data from payload.
+    customer_update = spark_processor.table_processing(raw_events , debeziumCustomerEventSchema , customer_write_schema)
+    
+    # ###### Create the customer table if it does not exists
+    customer_table_deltalake_instance = DeltaLakeInteraction(spark_processor.spark_session, sourceBucket , 'DimCustomer')
+    customer_table = customer_table_deltalake_instance.create_delta_table(customer_write_schema , customer_table_config)
 
-    # # # ###### Updating the customer table data on delta lake from our new events
-    # final_streaming = customer_update.writeStream.foreachBatch(lambda micro_df,epochId: batch_function_processing(micro_df, epochId, 
-    #     spark_processor,customer_table,customer_cdc_delta_schema , customer_fields_map)).option("checkpointLocation", "s3a://{}/{}/_checkpoint".format(sourceBucket,'DimCustomer')) \
-    #     .outputMode("update") \
-    #     .start()
+    # # ###### Updating the customer table data on delta lake from our new events
+    customer_update.writeStream.foreachBatch(lambda micro_df,epochId: batch_function_processing(micro_df, epochId, 
+        spark_processor,customer_table,customer_cdc_delta_schema , customer_fields_map)).option("checkpointLocation", "s3a://{}/{}/_checkpoint".format(sourceBucket,'DimCustomer')) \
+        .outputMode("update") \
+        .start()
     spark_processor.spark_session.streams.awaitAnyTermination()
 

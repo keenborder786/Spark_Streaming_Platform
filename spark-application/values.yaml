@@ -1,0 +1,44 @@
+
+
+
+
+kafka:
+  kafkaServer: my-release-kafka.default.svc.cluster.local:9092
+  topic_name: cdc_test_topics
+  consumer_config: '{"failOnDataLoss":"false"}'
+
+s3:
+  endPointLoc: 10.97.0.3:9000
+  user: user
+  password: password
+  source_bucket: test
+
+delta_lake_tables:
+  customer_table_config: '{"delta.appendOnly":"false","delta.enableChangeDataFeed":"true","delta.deletedFileRetentionDuration":"interval 7 days"}'
+  customer_schema: '{"fields":[{"metadata":{},"name":"id","nullable":true,"type":"string"},{"metadata":{},"name":"status","nullable":true,"type":"string"},{"metadata":{},"name":"status_metadata","nullable":true,"type":"string"},{"metadata":{},"name":"creator","nullable":true,"type":"string"},{"metadata":{},"name":"created","nullable":true,"type":"timestamp"},{"metadata":{},"name":"creator_type","nullable":true,"type":"string"},{"metadata":{},"name":"updater","nullable":true,"type":"string"},{"metadata":{},"name":"updated","nullable":true,"type":"timestamp"},{"metadata":{},"name":"updater_type","nullable":true,"type":"string"}]}'
+
+spark:
+  master_image:
+    registry: docker.io
+    repository: library/sparkmaster
+    tag: '1.0'
+    digest: ""
+  worker_image:
+    registry: docker.io
+    repository: library/sparkclient
+    tag: '1.0'
+    digest: ""
+  client_image:
+    registry: docker.io
+    repository: library/sparkbase
+    tag: '1.0'
+    digest: ""
+  master_config:
+    ip: '10.97.0.4'
+    replicas: 1
+  worker1_config:
+    ip: '10.97.0.5'
+    cores: '2'
+    memory: 1G
+    replicas: 1
+    

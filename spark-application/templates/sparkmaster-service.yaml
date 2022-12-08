@@ -5,7 +5,7 @@ metadata:
     app: sparkmaster
   name: sparkmaster-service
 spec:
-  clusterIP: 10.97.0.4
+  clusterIP: {{.Values.spark.master_config.ip}}
   ports:
     - name: "8080"
       port: 8080

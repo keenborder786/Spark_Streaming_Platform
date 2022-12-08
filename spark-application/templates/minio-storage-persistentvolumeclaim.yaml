@@ -3,6 +3,8 @@ kind: PersistentVolumeClaim
 metadata:
   labels:
     app: minio-storage
+  annotations:
+    "helm.sh/resource-policy": keep
   name: minio-storage
 spec:
   accessModes:

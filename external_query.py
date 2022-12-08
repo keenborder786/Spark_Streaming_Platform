@@ -2,15 +2,12 @@ import pyspark
 
 from dotenv import load_dotenv,find_dotenv
 load_dotenv(find_dotenv() , override = True)
-from pyspark.storagelevel import StorageLevel
 from pyspark.sql.types import *
 from pyspark.sql.functions import * 
-from streaming.spark_engine import SparkProcessing
 from streaming.deltalake_engine import DeltaLakeInteraction
 from pyspark.sql import SparkSession
-from streaming.config import (
-                    hadoop_config,
-                    sourceBucket)
+
+#spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.1,io.delta:delta-core_2.12:2.1.1,com.amazonaws:aws-java-sdk:1.12.341,org.apache.hadoop:hadoop-aws:3.3.4,org.apache.hadoop:hadoop-common:3.3.4 /home/mohtashimkhan/poc_kafka_delta/external_query.py
 
 if __name__ == '__main__':
 
@@ -33,5 +30,5 @@ if __name__ == '__main__':
     if hadoop_config != {}:
         for k,v in hadoop_config.items():
             spark.sparkContext._jsc.hadoopConfiguration().set(k, v)
-    customer_table_deltalake_instance = DeltaLakeInteraction(spark, sourceBucket , 'DimCustomer')
+    customer_table_deltalake_instance = DeltaLakeInteraction(spark, 'test' , 'DimCustomer')
     customer_table_deltalake_instance.query_latest_table().show()

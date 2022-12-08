@@ -10,5 +10,11 @@ spec:
     - name: "4040"
       port: 4040
       targetPort: 4040
+    - name: "40207"
+      port: 40207
+      targetPort: 40207
+    - name: "40208"
+      port: 40208
+      targetPort: 40208
   selector:
     app: sparkclient

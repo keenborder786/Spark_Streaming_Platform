@@ -5,7 +5,7 @@ metadata:
     app: sparkmaster
   name: sparkmaster
 spec:
-  replicas: 1
+  replicas: {{.Values.master_config.replicas}}
   selector:
     matchLabels:
       app: sparkmaster
@@ -28,7 +28,7 @@ spec:
               name: spark-packages
             - mountPath: /root/.ivy2/cache
               name: spark-cache
-      hostname: sparkmaster
+      hostname: spark
       restartPolicy: Always
       volumes:
         - name: spark-packages

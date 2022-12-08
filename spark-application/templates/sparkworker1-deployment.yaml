@@ -5,7 +5,7 @@ metadata:
     app: sparkworker1
   name: sparkworker1
 spec:
-  replicas: 1
+  replicas: {{.Values.worker1_config.replicas}}
   selector:
     matchLabels:
       app: sparkworker1
@@ -19,11 +19,11 @@ spec:
       containers:
         - env:
             - name: MASTER_HOST_NAME
-              value: spark://10.97.0.4:7077
+              value: {{print "spark://" .Values.spark.master_config.ip ":7077"}}
             - name: WORKER_MEMORY
-              value: 1G
+              value: {{.Values.worker1_config.memory}}
             - name: WORKER_CORES
-              value: '2'
+              value: {{.Values.worker1_config.cores}}
           image: sparkworker:1.0
           name: sparkworker1
           ports:

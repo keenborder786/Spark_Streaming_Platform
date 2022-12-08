@@ -18,71 +18,75 @@ spec:
     spec:
       containers:
         - env:
-            - name: CustomerTableConfig
+            - name: CUSTOMER_TABLE_CONFIG
               valueFrom:
                 configMapKeyRef:
-                  key: CustomerTableConfig
+                  key: CUSTOMER_TABLE_CONFIG
                   name: env
-            - name: KafkaConsumerConfig
+            - name: CUSTOMER_SCHEMA
               valueFrom:
                 configMapKeyRef:
-                  key: KafkaConsumerConfig
+                  key: CUSTOMER_SCHEMA
                   name: env
-            - name: KafkaServer
+            - name: KAFKA_CONSUMER_CONFIG
               valueFrom:
                 configMapKeyRef:
-                  key: KafkaServer
+                  key: KAFKA_CONSUMER_CONFIG
                   name: env
-            - name: S3EndPoint
+            - name: KAFKA_SERVER
               valueFrom:
                 configMapKeyRef:
-                  key: S3EndPoint
+                  key: KAFKA_SERVER
                   name: env
-            - name: S3Password
+            - name: S3_END_POINT
               valueFrom:
                 configMapKeyRef:
-                  key: S3Password
+                  key: S3_END_POINT
                   name: env
-            - name: S3USER
+            - name: S3_PASSWORD
               valueFrom:
                 configMapKeyRef:
-                  key: S3USER
+                  key: S3_PASSWORD
                   name: env
-            - name: SourceBucket
+            - name: S3_USER
               valueFrom:
                 configMapKeyRef:
-                  key: SourceBucket
+                  key: S3_USER
                   name: env
-            - name: TopicName
+            - name: SOURCE_BUCKET
               valueFrom:
                 configMapKeyRef:
-                  key: TopicName
+                  key: SOURCE_BUCKET
+                  name: env
+            - name: TOPIC_NAME
+              valueFrom:
+                configMapKeyRef:
+                  key: TOPIC_NAME
                   name: env
             - name: MASTER_HOST_NAME
-              value: spark://10.97.0.4:7077
-            - name: "SPARK_LOCAL_IP"
+              value: {{print "spark://" .Values.spark.master_config.ip ":7077"}}
+            - name: DRIVER_IP
               valueFrom:
                 fieldRef:
                   apiVersion: "v1"
                   fieldPath: "status.podIP"
-          resources:
-            requests:
-              memory: "2Gi"
-              cpu: "250m"
-            limits:
-              memory: "3Gi"
-              cpu: "2000m"
+            - name: DRIVER_HOST
+              value: 10.97.0.6
+            - name: DRIVER_PORT
+              value: '40207'
+            - name: DRIVER_BLOCK_MANAGER_PORT
+              value: '40208'
           image: sparkclient:1.0
           name: sparkclient
           ports:
             - containerPort: 4040
-            - containerPort: 4000
+            - containerPort: 40207
+            - containerPort: 40208
           volumeMounts:
             - mountPath: /root/.ivy2/jars
               name: spark-packages
             - mountPath: /root/.ivy2/cache
               name: spark-cache
-      hostname: sparkclient-service
       restartPolicy: Always
       volumes:
         - name: spark-packages
