@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: sparkclient
+  name: sparkclient
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sparkclient
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: sparkclient
+    spec:
+      containers:
+        - env:
+            - name: CUSTOMER_TABLE_CONFIG
+              valueFrom:
+                configMapKeyRef:
+                  key: CUSTOMER_TABLE_CONFIG
+                  name: env
+            - name: CUSTOMER_SCHEMA
+              valueFrom:
+                configMapKeyRef:
+                  key: CUSTOMER_SCHEMA
+                  name: env
+            - name: KAFKA_CONSUMER_CONFIG
+              valueFrom:
+                configMapKeyRef:
+                  key: KAFKA_CONSUMER_CONFIG
+                  name: env
+            - name: KAFKA_SERVER
+              valueFrom:
+                configMapKeyRef:
+                  key: KAFKA_SERVER
+                  name: env
+            - name: S3_END_POINT
+              valueFrom:
+                configMapKeyRef:
+                  key: S3_END_POINT
+                  name: env
+            - name: S3_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  key: S3_PASSWORD
+                  name: env
+            - name: S3_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: S3_USER
+                  name: env
+            - name: SOURCE_BUCKET
+              valueFrom:
+                configMapKeyRef:
+                  key: SOURCE_BUCKET
+                  name: env
+            - name: TOPIC_NAME
+              valueFrom:
+                configMapKeyRef:
+                  key: TOPIC_NAME
+                  name: env
+            - name: MASTER_HOST_NAME
+              value: {{print "spark://" .Values.spark.master_config.ip ":7077"}}
+            - name: DRIVER_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: "v1"
+                  fieldPath: "status.podIP"
+            - name: DRIVER_HOST
+              value: 10.97.0.6
+            - name: DRIVER_PORT
+              value: '40207'
+            - name: DRIVER_BLOCK_MANAGER_PORT
+              value: '40208'
+          image: sparkclient:1.0
+          name: sparkclient
+          ports:
+            - containerPort: 4040
+            - containerPort: 40207
+            - containerPort: 40208
+          volumeMounts:
+            - mountPath: /root/.ivy2/jars
+              name: spark-packages
+            - mountPath: /root/.ivy2/cache
+              name: spark-cache
+      restartPolicy: Always
+      volumes:
+        - name: spark-packages
+          persistentVolumeClaim:
+            claimName: spark-packages
+        - name: spark-cache
+          persistentVolumeClaim:
+            claimName: spark-cache

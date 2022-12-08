@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: sparkmaster
+  name: sparkmaster
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sparkmaster
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: sparkmaster
+    spec:
+      containers:
+        - image: sparkmaster:1.0
+          name: sparkmaster
+          ports:
+            - containerPort: 8080
+            - containerPort: 7077
+          tty: true
+          volumeMounts:
+            - mountPath: /root/.ivy2/jars
+              name: spark-packages
+            - mountPath: /root/.ivy2/cache
+              name: spark-cache
+      hostname: spark
+      restartPolicy: Always
+      volumes:
+        - name: spark-packages
+          persistentVolumeClaim:
+            claimName: spark-packages
+        - name: spark-cache
+          persistentVolumeClaim:
+            claimName: spark-cache

@@ -1,0 +1,6 @@
+name: spark-application
+description: A generated Helm Chart for spark-application
+version: 0.0.1
+apiVersion: v1
+keywords:
+  - spark

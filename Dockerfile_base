@@ -16,8 +16,8 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 ## Install java and spark
-RUN apt update && \
-    apt install -y default-jdk && \
+RUN apt-get update && \
+    apt-get install -y default-jdk && \
     wget https://downloads.apache.org/spark/spark-3.3.1/spark-3.3.1-bin-hadoop3.tgz && \
     tar -xzf spark-3.3.1-bin-hadoop3.tgz && \
     mv spark-3.3.1-bin-hadoop3 /opt/spark
