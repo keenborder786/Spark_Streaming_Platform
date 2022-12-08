@@ -1,0 +1,6 @@
+name: minio
+description: A generated Helm Chart for dev minio
+version: 0.0.1
+apiVersion: v1
+keywords:
+  - spark
