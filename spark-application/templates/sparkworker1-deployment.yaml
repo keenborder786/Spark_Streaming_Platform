@@ -5,7 +5,7 @@ metadata:
     app: sparkworker1
   name: sparkworker1
 spec:
-  replicas: {{.Values.worker1_config.replicas}}
+  replicas: 1
   selector:
     matchLabels:
       app: sparkworker1
@@ -21,9 +21,9 @@ spec:
             - name: MASTER_HOST_NAME
               value: {{print "spark://" .Values.spark.master_config.ip ":7077"}}
             - name: WORKER_MEMORY
-              value: {{.Values.worker1_config.memory}}
+              value: {{.Values.spark.worker1_config.memory}}
             - name: WORKER_CORES
-              value: {{.Values.worker1_config.cores}}
+              value: {{.Values.spark.worker1_config.cores | quote}}
           image: sparkworker:1.0
           name: sparkworker1
           ports:

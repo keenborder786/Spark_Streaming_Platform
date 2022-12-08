@@ -34,11 +34,9 @@ spark:
     tag: '1.0'
     digest: ""
   master_config:
-    ip: '10.97.0.4'
-    replicas: 1
+    ip: 10.97.0.4
   worker1_config:
-    ip: '10.97.0.5'
+    ip: 10.97.0.5
     cores: '2'
     memory: 1G
-    replicas: 1
     

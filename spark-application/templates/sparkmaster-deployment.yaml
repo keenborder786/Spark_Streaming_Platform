@@ -5,7 +5,7 @@ metadata:
     app: sparkmaster
   name: sparkmaster
 spec:
-  replicas: {{.Values.master_config.replicas}}
+  replicas: 1
   selector:
     matchLabels:
       app: sparkmaster
