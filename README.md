@@ -1,6 +1,8 @@
 # poc_kafka_delta
 
-### How to test run the pipeline?
+## How to test run the pipeline?
+
+### Method-1: Docker Compose
 
 #### Step:0 Create minio credentials:
 
@@ -60,3 +62,7 @@ cd poc_kafka_delta
 python simulate_kafka.py
 
 ```
+
+### Method-2: Helm Chart [Click Here](https://github.com/keenborder786/poc_kafka_delta/tree/helm_testing/spark-application)
+
+

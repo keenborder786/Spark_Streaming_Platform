@@ -9,8 +9,8 @@ This chart bootstraps our Spark Application deployment (Streaming Job Processing
 ## Prerequisites
 
 - K8 cluster
-- Kafka Cluster
-- S3 Bucket
+- Kafka Cluster (You need to have a running kafka server with atleast one topic and one broker)
+- S3 Bucket (You need to have a delta lake compliant S3 bucket)
 - Helm 3.2.0+
 
 ## Installing the Chart
@@ -18,14 +18,13 @@ This chart bootstraps our Spark Application deployment (Streaming Job Processing
 First you will have to make sure that the ***kafka cluster*** from where the cdc_packages are coming in and ***s3 bucket(delta lake)*** are up and running. 
 Afterwards, make sure that following parameters have been set up in the values.yaml file (details in [Parameters](#parameters)):
 
-  - KafkaServer
-  - S3EndPoint
-  - S3Password
-  - S3USER
-  - SourceBucket
-  - TopicName
-  - CustomerTableConfig
-  - KafkaConsumerConfig
+  - KAFKA_SERVER
+  - S3_USER
+  - S3_PASSWORD
+  - S3_END_POINT
+  - SOURCE_BUCKET
+  - TOPIC_NAME
+  - KAFKA_CONSUMER_CONFIG
 
 
 ```console
@@ -48,20 +47,20 @@ The command removes all the Spark Application components associated with the cha
 
 ## Parameters
 
-### Required parameters
+### Kafka Cluster parameters
 
-| Name                      | Description                                     | Value |
-| ------------------------- | ----------------------------------------------- | ----- |
-| `kafka.KafkaServer`       | Global Docker image registry                    | `""`  |
-| `deltalake.S3EndPoint`    | Global Docker registry secret names as an array | `[]`  |
-| `global.storageClass`     | Global StorageClass for Persistent Volume(s)    | `""`  |
+| Name                      | Description                                       | Value                                              |
+| ------------------------- | -----------------------------------------------   | -------------------------------------------------  |
+| `kafka.kafkaServer`       | Server of IP where the broker(s) are running      | `my-release-kafka.default.svc.cluster.local:9092`  |
+| `kafka.topic_name`        | Topic Name from where the cdc_packages are coming | `cdc_test_topics`                                  |
+| `kafka.consumer_config`   | Spark Config for Kafka as a consumer              | `'{"failOnDataLoss":"false"}'`                     |
 
 
-### Common parameters
+### S3 Parameters
 
 | Name                     | Description                                                                             | Value           |
 | ------------------------ | --------------------------------------------------------------------------------------- | --------------- |
-| `kubeVersion`            | Override Kubernetes version                                                             | `""`            |
+| `s3.endPointLoc`         | End Point for S3                                                                        | `10.97.0.3:9000`|
 | `nameOverride`           | String to partially override common.names.fullname                                      | `""`            |
 | `fullnameOverride`       | String to fully override common.names.fullname                                          | `""`            |
 | `clusterDomain`          | Default Kubernetes cluster domain                                                       | `cluster.local` |
