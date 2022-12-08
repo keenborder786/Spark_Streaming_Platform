@@ -161,11 +161,8 @@ pyspark_schema_reps_test
 #Any secrets used
 secrets
 
-## This script is just for testing purposes
-external_query.py
-
-## This was needed to run a developmental cluster
-kafka_values.yaml
+## Any scripts only for dev
+dev-only
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
 #  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
