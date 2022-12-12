@@ -22,8 +22,8 @@ Afterwards, make sure that following parameters have been set up in the values.y
   - S3_USER
   - S3_PASSWORD
   - S3_END_POINT
-  - SOURCE_BUCKET
-  - TOPIC_NAME
+  - S3_SOURCE_BUCKET
+  - KAFKA_TOPIC_NAME
   - KAFKA_CONSUMER_CONFIG
 
 
@@ -82,8 +82,8 @@ If you want to test run the spark job then follow the given step:
 
 | Name                                       | Description                                                                             | Value           |
 | -------------------------------------------| --------------------------------------------------------------------------------------- | --------------- |
-| `delta_lake_tables.customer_table_config`  | [Delta Lake Table Config](https://docs.delta.io/latest/table-properties.html) for customer table. You need to povide the configuration in form json where '{table-property:value}'.                                                                         |`'{"delta.appendOnly":"false","delta.enableChangeDataFeed":"true","delta.deletedFileRetentionDuration":"interval 7 days"}'`|  
-| `delta_lake_tables.customer_schema`       | The schema of the customer table. Should be provided in the following format: {fields:[{"metadata":{},"name":"col_name","nullable":true/false,"type":"string"/"integer"/"timestamp"/"float"}]}                                           | `'{"fields":[{"metadata":{},"name":"id","nullable":true,"type":"string"},{"metadata":{},"name":"status","nullable":true,"type":"string"},{"metadata":{},"name":"status_metadata","nullable":true,"type":"string"},{"metadata":{},"name":"creator","nullable":true,"type":"string"},{"metadata":{},"name":"created","nullable":true,"type":"timestamp"},{"metadata":{},"name":"creator_type","nullable":true,"type":"string"},{"metadata":{},"name":"updater","nullable":true,"type":"string"},{"metadata":{},"name":"updated","nullable":true,"type":"timestamp"},{"metadata":{},"name":"updater_type","nullable":true,"type":"string"}]}'`|
+| `delta_lake_tables.delta_lake_tables_config`  | [Delta Lake Table Config](https://docs.delta.io/latest/table-properties.html). You need to povide the configuration in form json where '{'Delta_Lake_Tables':{'Table_1':{table-property:value}}}'.                                                                         |`{"Delta_Lake_Tables": {"DimCustomer": {"delta.appendOnly": "false","delta.enableChangeDataFeed": "true","delta.deletedFileRetentionDuration": "interval 7 days"}}}`|  
+| `delta_lake_tables.delta_lake_schemas`       | The schema of the tables in delta lake. Should be provided in the following format: {'Delta_Lake_Tables':{'Table_1':{fields:[{"metadata":{},"name":"col_name","nullable":true/false,"type":"string"/"integer"/"timestamp"/"float"}]}}}                                           |`{"Delta_Lake_Tables": {"DimCustomer": {"fields": [{"metadata": {},"name": "id","nullable": true,"type": "string"}, {"metadata": {},"name": "status","nullable": true,"type": "string"}, {"metadata": {},"name": "status_metadata","nullable": true,"type": "string"}, {"metadata": {},"name": "creator","nullable": true,"type": "string"}, {"metadata": {},"name": "created","nullable": true,"type": "timestamp"}, {"metadata": {},"name": "creator_type","nullable": true,"type": "string"}, {"metadata": {},"name": "updater","nullable": true,"type": "string"}, {"metadata": {},"name": "updated","nullable": true,"type": "timestamp"}, {"metadata": {},"name": "updater_type","nullable": true,"type": "string"}]}}}`|
 
 ### Spark Cluster Parameters
 
