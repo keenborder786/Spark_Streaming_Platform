@@ -89,6 +89,8 @@ services:
     hostname: sparkclient
     ports:
       - '4040:4040'
+      - '40207:40207'
+      - '40208:40208'
     depends_on:
       - sparkmaster
     volumes:

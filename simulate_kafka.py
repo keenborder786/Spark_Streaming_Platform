@@ -1,6 +1,7 @@
 ## Will generate multiple payloads to kafka broker on the given server
 from kafka import KafkaProducer
-bootstrap_servers = ['my-release-kafka.default.svc.cluster.local:9092']
+from streaming.config import kafka_server
+bootstrap_servers = [kafka_server]
 topicName = 'cdc_test_topics'
 producer = KafkaProducer(bootstrap_servers = bootstrap_servers)
 payloads = [

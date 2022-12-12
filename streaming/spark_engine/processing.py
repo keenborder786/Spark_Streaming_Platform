@@ -4,11 +4,11 @@
     ## Transcations
 
 
-from streaming.spark_engine import SparkJob
+
 from pyspark.sql.functions import col,from_json,get_json_object,when
+from streaming.spark_engine import SparkJob
 from pyspark.sql.types import *
 from typing import List
-from streaming.config import spark_to_python_types
 import pyspark
 import json
 
@@ -40,7 +40,8 @@ class SparkProcessing(SparkJob):
 
     def table_processing(self,df:pyspark.sql.DataFrame , 
                               source_schema:StructType ,
-                              sink_schema:List[str]) -> pyspark.sql.DataFrame:
+                              sink_schema:List[str],
+                              spark_to_python_types) -> pyspark.sql.DataFrame:
         
         """
         This function will parse the payload in the streaming df and take the desired columns from payload for the any given table.

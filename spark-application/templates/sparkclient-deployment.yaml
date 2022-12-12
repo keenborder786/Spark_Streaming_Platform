@@ -18,15 +18,15 @@ spec:
     spec:
       containers:
         - env:
-            - name: CUSTOMER_TABLE_CONFIG
+            - name: DELTA_LAKE_TABLE_CONFIG
               valueFrom:
                 configMapKeyRef:
-                  key: CUSTOMER_TABLE_CONFIG
+                  key: DELTA_LAKE_TABLE_CONFIG
                   name: env
-            - name: CUSTOMER_SCHEMA
+            - name: DELTA_LAKE_SCHEMA
               valueFrom:
                 configMapKeyRef:
-                  key: CUSTOMER_SCHEMA
+                  key: DELTA_LAKE_SCHEMA
                   name: env
             - name: KAFKA_CONSUMER_CONFIG
               valueFrom:
@@ -53,15 +53,15 @@ spec:
                 configMapKeyRef:
                   key: S3_USER
                   name: env
-            - name: SOURCE_BUCKET
+            - name: S3_SOURCE_BUCKET
               valueFrom:
                 configMapKeyRef:
-                  key: SOURCE_BUCKET
+                  key: S3_SOURCE_BUCKET
                   name: env
-            - name: TOPIC_NAME
+            - name: KAFKA_TOPIC_NAME
               valueFrom:
                 configMapKeyRef:
-                  key: TOPIC_NAME
+                  key: KAFKA_TOPIC_NAME
                   name: env
             - name: MASTER_HOST_NAME
               value: {{print "spark://" .Values.spark.master_config.ip ":7077"}}
