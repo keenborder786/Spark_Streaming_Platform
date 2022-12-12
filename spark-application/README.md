@@ -81,7 +81,7 @@ If you want to test run the spark job then follow the given step:
 ### Delta Lake Tables Parameters
 
 | Name                                       | Description                                                                             | Value           |
-| -------------------------------------------| --------------------------------------------------------------------------------------- | --------------- |
+| -------------------------------------------| --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `delta_lake_tables.delta_lake_tables_config`  | [Delta Lake Table Config](https://docs.delta.io/latest/table-properties.html). You need to povide the configuration in form json where '{'Delta_Lake_Tables':{'Table_1':{table-property:value}}}'.                                                                         |`{"Delta_Lake_Tables": {"DimCustomer": {"delta.appendOnly": "false","delta.enableChangeDataFeed": "true","delta.deletedFileRetentionDuration": "interval 7 days"}}}`|  
 | `delta_lake_tables.delta_lake_schemas`       | The schema of the tables in delta lake. Should be provided in the following format: {'Delta_Lake_Tables':{'Table_1':{fields:[{"metadata":{},"name":"col_name","nullable":true/false,"type":"string"/"integer"/"timestamp"/"float"}]}}}                                           |`{"Delta_Lake_Tables": {"DimCustomer": {"fields": [{"metadata": {},"name": "id","nullable": true,"type": "string"}, {"metadata": {},"name": "status","nullable": true,"type": "string"}, {"metadata": {},"name": "status_metadata","nullable": true,"type": "string"}, {"metadata": {},"name": "creator","nullable": true,"type": "string"}, {"metadata": {},"name": "created","nullable": true,"type": "timestamp"}, {"metadata": {},"name": "creator_type","nullable": true,"type": "string"}, {"metadata": {},"name": "updater","nullable": true,"type": "string"}, {"metadata": {},"name": "updated","nullable": true,"type": "timestamp"}, {"metadata": {},"name": "updater_type","nullable": true,"type": "string"}]}}}`|
 
@@ -92,29 +92,29 @@ If you want to test run the spark job then follow the given step:
 
 | Name                            | Description                                                    | Value                |
 | ------------------------        | -----------------------------------                            | ---------------      |
-| spark.master_image.registry    | Spark Master Image registry                                    | `docker.io`          |
-| spark.master_image.repository  | Spark Master Image repository                                  | `library/sparkmaster`|
-| spark.master_image.tag         | Spark Master Image tag (immutable tags are recommended)        | `1.0`                |
-| spark.master_image.digest      | Spark Master Image digest                                      | `""`                 |
-| spark.worker_image.registry    | Spark Worker Image registry                                    | `docker.io`          |
-| spark.worker_image.repository  | Spark Worker Image repository                                  | `library/sparkmaster`|
-| spark.worker_image.tag         | Spark Worker Image tag (immutable tags are recommended)        | `1.0`                |
-| spark.worker_image.digest      | Spark Worker Image digest                                      | `""`                 |
-| spark.client_image.registry    | Spark Client Image registry                                    | `docker.io`          |
-| spark.client_image.repository  | Spark Client Image repository                                  | `library/sparkmaster`|
-| spark.client_image.tag         | Spark Client Image tag (immutable tags are recommended)        | `1.0`                |
-| spark.client_image.digest      | Spark Client Image digest                                      | `""`                 |
+| `spark.master_image.registry`    | Spark Master Image registry                                    | `docker.io`          |
+| `spark.master_image.repository`  | Spark Master Image repository                                  | `library/sparkmaster`|
+| `spark.master_image.tag`         | Spark Master Image tag (immutable tags are recommended)        | `1.0`                |
+| `spark.master_image.digest`      | Spark Master Image digest                                      | `""`                 |
+| `spark.worker_image.registry`    | Spark Worker Image registry                                    | `docker.io`          |
+| `spark.worker_image.repository`  | Spark Worker Image repository                                  | `library/sparkmaster`|
+| `spark.worker_image.tag`         | Spark Worker Image tag (immutable tags are recommended)        | `1.0`                |
+| `spark.worker_image.digest`      | Spark Worker Image digest                                      | `""`                 |
+| `spark.client_image.registry`    | Spark Client Image registry                                    | `docker.io`          |
+| `spark.client_image.repository`  | Spark Client Image repository                                  | `library/sparkmaster`|
+| `spark.client_image.tag`         | Spark Client Image tag (immutable tags are recommended)        | `1.0`                |
+| `spark.client_image.digest`      | Spark Client Image digest                                      | `""`                 |
 
 #### Master Config
 | Name                            | Description                                                    | Value                |
 | ------------------------        | -----------------------------------                            | -------------------- |
-| spark.master_config.ip         | IP Address for Master Service                                  | `10.97.0.4`          |
+| `spark.master_config.ip`         | IP Address for Master Service                                  | `10.97.0.4`          |
 
 #### Worker1 Config
 | Name                             | Description                                                    | Value                |
 | ------------------------         | -----------------------------------                            | -------------------- |
-| spark.worker1_config.ip         | IP Address for Worker 1 Service                                | `10.97.0.5`          |
-| spark.worker1_config.cores      | Cores for Worker 1                                             | `2`                  |
-| spark.worker1_config.memory     | Memory for Worker 1                                            | `1G`                 |
+| `spark.worker1_config.ip`         | IP Address for Worker 1 Service                                | `10.97.0.5`          |
+| `spark.worker1_config.cores`      | Cores for Worker 1                                             | `2`                  |
+| `spark.worker1_config.memory`     | Memory for Worker 1                                            | `1G`                 |
 
 
