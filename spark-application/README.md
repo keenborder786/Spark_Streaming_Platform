@@ -49,11 +49,11 @@ The command removes all the Spark Application components associated with the cha
 
 If you want to test run the spark job then follow the given step:
 
-- Step-0: Set up minikube cluster by following the [instruction] (https://minikube.sigs.k8s.io/docs/start/)
+- Step-0: Set up minikube cluster by following the [instruction](https://minikube.sigs.k8s.io/docs/start/)
 - Step-1: Install [Helm](https://helm.sh/docs/intro/install/)  
 - Step-2: Install kafka cluster chart by [bitnami](https://github.com/bitnami/charts/tree/main/bitnami/kafka) and deploy on minikube with default values.
-- Step-3: Set up dev minio chart provided [here](https://github.com/keenborder786/poc_kafka_delta/tree/helm_testing/minio) and deploy on minikube.
-- Step-4: Build all of the images for all the docker files from [here](https://github.com/keenborder786/poc_kafka_delta/tree/helm_testing)
+- Step-3: Set up dev minio chart provided [here](https://github.com/keenborder786/poc_kafka_delta/tree/main/minio) and deploy on minikube.
+- Step-4: Build all of the images for all the docker files from [here](https://github.com/keenborder786/poc_kafka_delta/tree/main)
 - Step-5: Now run the spark helm chart and deploy on minikube with default values.
 - Step-6: Open the shell of sparkclient pod running on minikube and run the following script ***/opt/poc_kafka_delta/simulate_kafka.py*** to test run a job for customer table.
 
@@ -92,29 +92,29 @@ If you want to test run the spark job then follow the given step:
 
 | Name                            | Description                                                    | Value                |
 | ------------------------        | -----------------------------------                            | ---------------      |
-| `spark.master_image.registry    | Spark Master Image registry                                    | `docker.io`          |
-| `spark.master_image.repository  | Spark Master Image repository                                  | `library/sparkmaster`|
-| `spark.master_image.tag         | Spark Master Image tag (immutable tags are recommended)        | `1.0`                |
-| `spark.master_image.digest      | Spark Master Image digest                                      | `""`                 |
-| `spark.worker_image.registry    | Spark Worker Image registry                                    | `docker.io`          |
-| `spark.worker_image.repository  | Spark Worker Image repository                                  | `library/sparkmaster`|
-| `spark.worker_image.tag         | Spark Worker Image tag (immutable tags are recommended)        | `1.0`                |
-| `spark.worker_image.digest      | Spark Worker Image digest                                      | `""`                 |
-| `spark.client_image.registry    | Spark Client Image registry                                    | `docker.io`          |
-| `spark.client_image.repository  | Spark Client Image repository                                  | `library/sparkmaster`|
-| `spark.client_image.tag         | Spark Client Image tag (immutable tags are recommended)        | `1.0`                |
-| `spark.client_image.digest      | Spark Client Image digest                                      | `""`                 |
+| spark.master_image.registry    | Spark Master Image registry                                    | `docker.io`          |
+| spark.master_image.repository  | Spark Master Image repository                                  | `library/sparkmaster`|
+| spark.master_image.tag         | Spark Master Image tag (immutable tags are recommended)        | `1.0`                |
+| spark.master_image.digest      | Spark Master Image digest                                      | `""`                 |
+| spark.worker_image.registry    | Spark Worker Image registry                                    | `docker.io`          |
+| spark.worker_image.repository  | Spark Worker Image repository                                  | `library/sparkmaster`|
+| spark.worker_image.tag         | Spark Worker Image tag (immutable tags are recommended)        | `1.0`                |
+| spark.worker_image.digest      | Spark Worker Image digest                                      | `""`                 |
+| spark.client_image.registry    | Spark Client Image registry                                    | `docker.io`          |
+| spark.client_image.repository  | Spark Client Image repository                                  | `library/sparkmaster`|
+| spark.client_image.tag         | Spark Client Image tag (immutable tags are recommended)        | `1.0`                |
+| spark.client_image.digest      | Spark Client Image digest                                      | `""`                 |
 
 #### Master Config
 | Name                            | Description                                                    | Value                |
 | ------------------------        | -----------------------------------                            | -------------------- |
-| `spark.master_config.ip         | IP Address for Master Service                                  | `10.97.0.4`          |
+| spark.master_config.ip         | IP Address for Master Service                                  | `10.97.0.4`          |
 
 #### Worker1 Config
 | Name                             | Description                                                    | Value                |
 | ------------------------         | -----------------------------------                            | -------------------- |
-| `spark.worker1_config.ip         | IP Address for Worker 1 Service                                | `10.97.0.5`          |
-| `spark.worker1_config.cores      | Cores for Worker 1                                             | `2`                  |
-| `spark.worker1_config.memory     | Memory for Worker 1                                            | `1G`                 |
+| spark.worker1_config.ip         | IP Address for Worker 1 Service                                | `10.97.0.5`          |
+| spark.worker1_config.cores      | Cores for Worker 1                                             | `2`                  |
+| spark.worker1_config.memory     | Memory for Worker 1                                            | `1G`                 |
 
 
