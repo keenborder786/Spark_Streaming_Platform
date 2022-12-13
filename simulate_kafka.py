@@ -41,7 +41,37 @@ payloads = [
 		"transaction": null
 	}}
     """
-    ,r"""
+    ,
+	 r"""
+    {"payload": {
+		"before": null,
+		"after": {
+			"id": {
+				"value": "1947",
+				"set": true
+			},
+			"value":null
+		},
+		"source": {
+			"version": "1.7.0.13-BETA",
+			"connector": "yugabytedb",
+			"name": "dbserver1",
+			"ts_ms": -4258763232015,
+			"snapshot": "false",
+			"db": "yugabyte",
+			"sequence": "[\"0:0::0:0\",\"1:367::0:0\"]",
+			"schema": "public",
+			"table": "Transaction",
+			"txId": "",
+			"lsn": "1:367::0:0",
+			"xmin": null
+		},
+		"op": "c",
+		"ts_ms": 1669795724769,
+		"transaction": null
+	}}
+    """
+	,r"""
 	{"payload": {
 		"before": {
 			"id": {
@@ -76,7 +106,41 @@ payloads = [
 		"ts_ms": 1669795724766,
 		"transaction": null
 	}}
- """,r"""
+ """,
+	 r"""
+    {"payload": {
+		"before": null,
+		"after": {
+			"id": {
+				"value": "1947",
+				"set": true
+			},
+			"value":{
+				"value":1000,
+				"set":true
+
+			}
+		},
+		"source": {
+			"version": "1.7.0.13-BETA",
+			"connector": "yugabytedb",
+			"name": "dbserver1",
+			"ts_ms": -4258763232015,
+			"snapshot": "false",
+			"db": "yugabyte",
+			"sequence": "[\"0:0::0:0\",\"1:367::0:0\"]",
+			"schema": "public",
+			"table": "Transaction",
+			"txId": "",
+			"lsn": "1:367::0:0",
+			"xmin": null
+		},
+		"op": "u",
+		"ts_ms": 1669795724772,
+		"transaction": null
+	}}
+    """
+ ,r"""
 	{"payload": {
 		"before": null,
 		"after": {
@@ -127,6 +191,39 @@ payloads = [
 		"transaction": null
 	}}
 """,
+	 r"""
+    {"payload": {
+		"before": null,
+		"after": {
+			"id": {
+				"value": "1942",
+				"set": true
+			},
+			"value":{
+				"value":10000,
+				"set":true
+
+			}
+		},
+		"source": {
+			"version": "1.7.0.13-BETA",
+			"connector": "yugabytedb",
+			"name": "dbserver1",
+			"ts_ms": -4258763232015,
+			"snapshot": "false",
+			"db": "yugabyte",
+			"sequence": "[\"0:0::0:0\",\"1:367::0:0\"]",
+			"schema": "public",
+			"table": "Transaction",
+			"txId": "",
+			"lsn": "1:367::0:0",
+			"xmin": null
+		},
+		"op": "c",
+		"ts_ms": 1669795724781,
+		"transaction": null
+	}}
+    """,
 r"""
 	{"payload": {
 		"before": null,

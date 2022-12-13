@@ -18,7 +18,7 @@ class SparkProcessing(SparkJob):
     def __init__(self,app_name,hadoop_config):
         super().__init__(app_name,hadoop_config)
     
-    def event_processing(self , df:pyspark.sql.DataFrame) -> pyspark.sql.DataFrame:
+    def event_processing(self , df:pyspark.sql.DataFrame , debeziumSourceSchema:StructType()) -> pyspark.sql.DataFrame:
         """
         
         This function extracts the payload from raw value column coming from kafka.
@@ -36,7 +36,10 @@ class SparkProcessing(SparkJob):
         df = df.withColumn('value', col('value').cast('string'))
         df = df.filter((df.value.isNotNull()) & (df.value.like('%payload%'))) ## Safety Check: Payload should be present. Accountng for any null values.
         df = df.withColumn('payload',get_json_object(df.value ,'$.payload'))
-        return df.select('payload')
+        df = df.withColumn('source',get_json_object(df.value ,'$.payload.source'))
+        df = df.withColumn('source',col('source').cast(StringType()))
+        df = df.withColumn('source',from_json(col('source') , debeziumSourceSchema))
+        return df.select('payload','source')
 
     def table_processing(self,df:pyspark.sql.DataFrame , 
                               source_schema:StructType ,
