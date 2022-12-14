@@ -1,4 +1,6 @@
-"""This module will run our streaming pipeline"""
+"""
+This module will run our streaming pipeline
+"""
 
 
 from typing import Dict, Optional
