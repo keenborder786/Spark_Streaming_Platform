@@ -9,7 +9,7 @@ loading from all env variables
 from dotenv import find_dotenv, load_dotenv
 
 from streaming.config import (
-    debeziumSourceSchema,
+    debeziumsourceschema,
     delta_lake_tables_config,
     final_schemas,
     hadoop_config,
@@ -72,7 +72,7 @@ if __name__ == "__main__":
         # Extracting payload which contains the events for our table.
         hash_map_variables_streams["raw_events_" + str(table)] = spark_processor.event_processing(
             hash_map_variables_streams["df_" +
-                                       str(table)], debeziumSourceSchema
+                                       str(table)], debeziumsourceschema
         )
 
         # Filtering out the events that we need for the table

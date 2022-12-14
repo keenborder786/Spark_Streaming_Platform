@@ -51,7 +51,7 @@ hadoop_config = {
     "spark.hadoop.fs.s3a.impl": "org.apache.hadoop.fs.s3a.S3AFileSystem",
 }
 
-debeziumSourceSchema = StructType(
+debeziumsourceschema = StructType(
     [
         StructField("version", StringType()),
         StructField("connector", StringType()),
@@ -75,7 +75,7 @@ for table in delta_lake_schemas:
         table_fields_map,
         table_cdc_delta_schema,
         debeziumTableEventSchema,
-    ) = parse_json(delta_lake_schemas[table]["fields"], spark_to_python_types, debeziumSourceSchema)
+    ) = parse_json(delta_lake_schemas[table]["fields"], spark_to_python_types, debeziumsourceschema)
     final_schemas[table][f"{table}_write_schema"] = table_write_schema
     final_schemas[table][f"{table}_fields_map"] = table_fields_map
     final_schemas[table][f"{table}_cdc_delta_schema"] = table_cdc_delta_schema

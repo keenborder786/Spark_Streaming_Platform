@@ -1,8 +1,12 @@
-# This modules will contain the business logic for processing multiple streams that are coming from kafka.
-# Raw_Messages_IDs
-# Customers
-# Transcations
+"""
 
+This modules will contain the business logic for processing multiple streams
+that are coming from kafka.
+    - Raw_Messages_IDs
+    - Customers
+    - Transcations
+
+"""
 
 import json
 from typing import List
@@ -15,11 +19,15 @@ from streaming.spark_engine import SparkJob
 
 
 class SparkProcessing(SparkJob):
+    """
+    The main class which start our SparkSession and reads the data from our kafka streaming source
+    """
+
     def __init__(self, app_name, hadoop_config):
         super().__init__(app_name, hadoop_config)
 
     def event_processing(
-        self, df: pyspark.sql.DataFrame, debeziumSourceSchema: StructType()
+        self, df: pyspark.sql.DataFrame, debeziumsourceschema: StructType()
     ) -> pyspark.sql.DataFrame:
         """
 
@@ -44,7 +52,7 @@ class SparkProcessing(SparkJob):
             df.value, "$.payload.source"))
         df = df.withColumn("source", col("source").cast(StringType()))
         df = df.withColumn("source", from_json(
-            col("source"), debeziumSourceSchema))
+            col("source"), debeziumsourceschema))
         return df.select("payload", "source")
 
     def table_processing(
@@ -55,11 +63,12 @@ class SparkProcessing(SparkJob):
         spark_to_python_types,
     ) -> pyspark.sql.DataFrame:
         """
-        This function will parse the payload in the streaming df and take the desired columns from payload for the any given table.
-
+        This function will parse the payload in the streaming df and
+        take the desired columns from payload for the any given table.
         Parameters:
         -----------------------------------------------------------------
-        df(pyspark.sql.DataFrame): Streaming data which consist of payload column that needs to be used to update the table
+        df(pyspark.sql.DataFrame): Streaming data which consist of payload column
+        that needs to be used to update the table
 
         source_schema(StructType): This consist of schema of the payload coming from debezium connector
 
