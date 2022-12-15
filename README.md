@@ -28,7 +28,7 @@ DRIVER_BLOCK_MANAGER_PORT=40208
 
 ```
 <p> KafkaConsumerConfig options can be seen from: https://spark.apache.org/docs/2.1.0/structured-streaming-kafka-integration.html </p>
-<p> DeltaTableConfig (for Raw and Customer Tables) options can be seen from: https://docs.delta.io/latest/table-properties.html </p>
+
 
 #### Step:2 Build the docker images for sparkbase,sparkmaster,sparkworker & sparkclient
 
@@ -69,3 +69,22 @@ python simulate_kafka.py
 ### Method-2: Helm Chart [Click Here](https://github.com/keenborder786/poc_kafka_delta/tree/helm_testing/spark-application)
 
 ## How to set up dev environment for contributing?
+
+  - Install [mamba](https://github.com/conda-forge/miniforge#mambaforge) for conda package management on your local machine. More [Instruction](https://mamba.readthedocs.io/en/latest/installation.html).
+  - Once mamba is set up, clone the repo and run the following commands in the root directory: 
+  ```console
+  
+  mamba env create -f environment.yml
+  conda activate spark_streaming
+
+  ```
+  - Now you can start developing in the repo.
+  - Once you are done with the changes, run the following command:
+  
+  ```console
+
+  pre-commit install
+
+  ```
+  - This will install a pre-commit github hook to format your code according to pep 8 standards. For the packages we are using to format the code refer   to .pre-commit-config.yaml
+   - You can now commit your code.
