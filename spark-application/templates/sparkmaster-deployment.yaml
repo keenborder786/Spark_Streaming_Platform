@@ -17,7 +17,7 @@ spec:
         app: sparkmaster
     spec:
       containers:
-        - image: sparkmaster:1.0
+        - image: {{printf "%s/%s:%s" .Values.spark.master_image.registry .Values.spark.master_image.repository .Values.spark.master_image.tag}}
           name: sparkmaster
           ports:
             - containerPort: 8080

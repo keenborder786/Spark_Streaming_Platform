@@ -1,4 +1,4 @@
-FROM sparkbase:1.0
+FROM quay.io/oknah/sparkbase:1.0
 
 ENV MASTER_HOST_NAME=''
 ENV DRIVER_HOST = ''

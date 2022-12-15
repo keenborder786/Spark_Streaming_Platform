@@ -1,5 +1,5 @@
 
-FROM condaforge/mambaforge:latest
+FROM docker.io/condaforge/mambaforge@sha256:a119fe148b8a276397cb7423797f8ee82670e64b071dc39c918b6c3513bd0174
 
 RUN bin/bash
 
@@ -11,7 +11,7 @@ RUN echo "conda activate spark_streaming" >> ~/.bashrc
 
 
 # Install base utilities
-ENV DEBIAN_FRONTEND=noninteractive 
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get install -y build-essential  && \
     apt-get install -yq curl wget jq vim && \

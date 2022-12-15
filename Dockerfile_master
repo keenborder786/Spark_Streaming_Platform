@@ -1,4 +1,4 @@
-FROM sparkbase:1.0
+FROM quay.io/oknah/sparkbase:1.0
 
 
 ## Execute the final shell script to run our job

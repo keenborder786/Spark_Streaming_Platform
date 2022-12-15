@@ -1,4 +1,4 @@
-FROM sparkbase:1.0
+FROM quay.io/oknah/sparkbase:1.0
 
 ENV MASTER_HOST_NAME=spark://localhost:7077
 ENV WORKER_MEMORY=1G

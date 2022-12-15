@@ -15,18 +15,18 @@ s3:
 
 spark:
   master_image:
-    registry: docker.io
-    repository: library/sparkmaster
+    registry: quay.io/oknah
+    repository: sparkmaster
     tag: '1.0'
     digest: ""
   worker_image: 
-    registry: docker.io
-    repository: library/sparkclient
+    registry: quay.io/oknah
+    repository: sparkworker
     tag: '1.0'
     digest: ""
   client_image:
-    registry: docker.io
-    repository: library/sparkbase
+    registry: quay.io/oknah
+    repository: sparkclient
     tag: '1.0'
     digest: ""
   master_config:

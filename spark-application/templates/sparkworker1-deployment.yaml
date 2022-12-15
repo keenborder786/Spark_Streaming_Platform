@@ -24,7 +24,7 @@ spec:
               value: {{.Values.spark.worker1_config.memory}}
             - name: WORKER_CORES
               value: {{.Values.spark.worker1_config.cores | quote}}
-          image: sparkworker:1.0
+          image: {{printf "%s/%s:%s" .Values.spark.worker_image.registry .Values.spark.worker_image.repository .Values.spark.worker_image.tag}}
           name: sparkworker1
           ports:
             - containerPort: 8081

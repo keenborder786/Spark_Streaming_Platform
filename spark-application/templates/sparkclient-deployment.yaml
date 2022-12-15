@@ -66,7 +66,7 @@ spec:
               value: '40207'
             - name: DRIVER_BLOCK_MANAGER_PORT
               value: '40208'
-          image: sparkclient:1.0
+          image: {{printf "%s/%s:%s" .Values.spark.client_image.registry .Values.spark.client_image.repository .Values.spark.client_image.tag}}
           name: sparkclient
           ports:
             - containerPort: 4040
