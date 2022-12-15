@@ -78,13 +78,6 @@ If you want to test run the spark job then follow the given step:
 | `s3.source_bucket`       | Bucket Name where your delta lake tables are.                                           | `test`          |
 
 
-### Delta Lake Tables Parameters
-
-| Name                                       | Description                                                                             | Value           |
-| -------------------------------------------| --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `delta_lake_tables.delta_lake_tables_config`  | [Delta Lake Table Config](https://docs.delta.io/latest/table-properties.html). You need to povide the configuration in form json where '{'Delta_Lake_Tables':{'Table_1':{table-property:value}}}'.                                                                         |`{"Delta_Lake_Tables": {"DimCustomer": {"delta.appendOnly": "false","delta.enableChangeDataFeed": "true","delta.deletedFileRetentionDuration": "interval 7 days"}}}`|  
-| `delta_lake_tables.delta_lake_schemas`       | The schema of the tables in delta lake. Should be provided in the following format: {'Delta_Lake_Tables':{'Table_1':{fields:[{"metadata":{},"name":"col_name","nullable":true/false,"type":"string"/"integer"/"timestamp"/"float"}]}}}                                           |`{"Delta_Lake_Tables": {"DimCustomer": {"fields": [{"metadata": {},"name": "id","nullable": true,"type": "string"}, {"metadata": {},"name": "status","nullable": true,"type": "string"}, {"metadata": {},"name": "status_metadata","nullable": true,"type": "string"}, {"metadata": {},"name": "creator","nullable": true,"type": "string"}, {"metadata": {},"name": "created","nullable": true,"type": "timestamp"}, {"metadata": {},"name": "creator_type","nullable": true,"type": "string"}, {"metadata": {},"name": "updater","nullable": true,"type": "string"}, {"metadata": {},"name": "updated","nullable": true,"type": "timestamp"}, {"metadata": {},"name": "updater_type","nullable": true,"type": "string"}]}}}`|
-
 ### Spark Cluster Parameters
 
 
