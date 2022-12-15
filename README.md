@@ -66,7 +66,7 @@ python simulate_kafka.py
 
 ```
 
-### Method-2: Helm Chart [Click Here](https://github.com/keenborder786/poc_kafka_delta/tree/helm_testing/spark-application)
+### Method-2: Helm Chart [Click Here](https://github.com/keenborder786/poc_kafka_delta/tree/main/spark-application)
 
 ## How to set up dev environment for contributing?
 
