@@ -3,8 +3,6 @@ kind: ConfigMap
 metadata:
   name: env
 data:
-  DELTA_LAKE_TABLE_CONFIG: {{.Values.delta_lake_tables.delta_lake_tables_config | toPrettyJson}}
-  DELTA_LAKE_SCHEMA: {{.Values.delta_lake_tables.delta_lake_schemas | toPrettyJson}}
   KAFKA_CONSUMER_CONFIG: {{.Values.kafka.consumer_config | toPrettyJson}}
   KAFKA_SERVER: {{.Values.kafka.kafkaServer}}
   KAFKA_TOPIC_NAME: {{.Values.kafka.topic_name}}

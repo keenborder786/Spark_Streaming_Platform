@@ -13,10 +13,6 @@ s3:
   password: password
   source_bucket: test
 
-delta_lake_tables:
-  delta_lake_tables_config: '{"Delta_Lake_Tables": {"customer": {"delta.appendOnly": "false","delta.enableChangeDataFeed": "true","delta.deletedFileRetentionDuration": "interval 7 days"}}}'
-  delta_lake_schemas: '{"Delta_Lake_Tables": {"customer": {"fields": [{"metadata": {},"name": "id","nullable": true,"type": "string"}, {"metadata": {},"name": "status","nullable": true,"type": "string"}, {"metadata": {},"name": "status_metadata","nullable": true,"type": "string"}, {"metadata": {},"name": "creator","nullable": true,"type": "string"}, {"metadata": {},"name": "created","nullable": true,"type": "timestamp"}, {"metadata": {},"name": "creator_type","nullable": true,"type": "string"}, {"metadata": {},"name": "updater","nullable": true,"type": "string"}, {"metadata": {},"name": "updated","nullable": true,"type": "timestamp"}, {"metadata": {},"name": "updater_type","nullable": true,"type": "string"}]},"Transaction": {"fields": [{"metadata": {},"name": "id","nullable": true,"type": "string"},{"metadata": {},"name": "value","nullable": true,"type": "integer"}]}}}'
-
 spark:
   master_image:
     registry: docker.io

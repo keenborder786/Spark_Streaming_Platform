@@ -5,9 +5,11 @@ ENV DRIVER_HOST = ''
 ENV DRIVER_IP=''
 ENV DRIVER_PORT=''
 ENV DRIVER_BLOCK_MANAGER_PORT=''
+
 ## Setting up my code
 COPY streaming/ /opt/poc_kafka_delta/streaming/
 COPY main.py /opt/poc_kafka_delta
+COPY .env.schema /opt/poc_kafka_delta
 COPY simulate_kafka.py /opt/poc_kafka_delta
 COPY spark-defaults.conf /opt/spark/conf
 
@@ -18,4 +20,5 @@ CMD $SPARK_HOME/bin/spark-submit --packages org.apache.spark:spark-sql-kafka-0-1
     --conf spark.driver.bindAddress=$DRIVER_IP \
     --conf spark.driver.port=$DRIVER_PORT \
     --conf spark.driver.blockManager.port=$DRIVER_BLOCK_MANAGER_PORT \
+    --conf spark.pyspark.python=/opt/conda/envs/spark_streaming/bin/python \
     /opt/poc_kafka_delta/main.py

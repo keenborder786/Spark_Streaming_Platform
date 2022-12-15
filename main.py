@@ -5,9 +5,6 @@ loading from all env variables
 
 """
 
-
-from dotenv import find_dotenv, load_dotenv
-
 from streaming.config import (
     debeziumsourceschema,
     delta_lake_tables_config,
@@ -22,8 +19,6 @@ from streaming.config import (
 from streaming.deltalake_engine import DeltaLakeInteraction
 from streaming.spark_engine import SparkProcessing
 from streaming.utils import bindFunction
-
-load_dotenv(find_dotenv(), override=True)
 
 if __name__ == "__main__":
     # Setting up the spark session

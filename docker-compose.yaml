@@ -97,7 +97,7 @@ services:
       - spark_packages:/root/.ivy2/jars
       - spark_cache:/root/.ivy2/cache
     env_file:
-      - .env
+      - .env.compose
     networks:
       datapipeline:
         ipv4_address: 172.18.0.8

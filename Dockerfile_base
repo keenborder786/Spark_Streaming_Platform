@@ -1,14 +1,17 @@
 
-FROM continuumio/miniconda3:latest
+FROM condaforge/mambaforge:latest
 
+RUN bin/bash
+
+## Creating the new conda environment with the desired packages using mamba
 WORKDIR /opt
-
-## Updating the current conda environment with desired packages
 COPY environment.yml .
-RUN conda update -n base conda && \
-    conda env update --name base -f environment.yml
+RUN mamba env create -f environment.yml
+RUN echo "conda activate spark_streaming" >> ~/.bashrc
+
 
 # Install base utilities
+ENV DEBIAN_FRONTEND=noninteractive 
 RUN apt-get update && \
     apt-get install -y build-essential  && \
     apt-get install -yq curl wget jq vim && \

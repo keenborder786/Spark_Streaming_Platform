@@ -7,6 +7,7 @@ needed to run our streaming pipeline.
 import json
 import os
 
+from dotenv import find_dotenv, load_dotenv
 from pyspark.sql.types import (
     FloatType,
     IntegerType,
@@ -19,7 +20,8 @@ from pyspark.sql.types import (
 
 from streaming.utils import parse_json
 
-# All of the configs needed to run the streaming pipeline
+# loading the schemas and config for delta lake tables
+load_dotenv(find_dotenv(".env.schema"), override=True)
 s3accessKeyAws = os.environ["S3_USER"]
 s3secretKeyAws = os.environ["S3_PASSWORD"]
 s3endPointLoc = os.environ["S3_END_POINT"]
@@ -29,7 +31,7 @@ kafka_config = json.loads(os.environ["KAFKA_CONSUMER_CONFIG"])
 topic_name = os.environ["KAFKA_TOPIC_NAME"]
 delta_lake_tables_config = json.loads(os.environ["DELTA_LAKE_TABLE_CONFIG"])[
     "Delta_Lake_Tables"]
-delta_lake_schemas = json.loads(os.environ["DELTA_LAKE_SCHEMA"])[
+delta_lake_schemas = json.loads(os.environ["DELTA_LAKE_TABLE_SCHEMAS"])[
     "Delta_Lake_Tables"]
 
 spark_to_python_types = {
