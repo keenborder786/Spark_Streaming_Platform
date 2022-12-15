@@ -13,17 +13,13 @@ s3:
   password: password
   source_bucket: test
 
-delta_lake_tables:
-  customer_table_config: '{"delta.appendOnly":"false","delta.enableChangeDataFeed":"true","delta.deletedFileRetentionDuration":"interval 7 days"}'
-  customer_schema: '{"fields":[{"metadata":{},"name":"id","nullable":true,"type":"string"},{"metadata":{},"name":"status","nullable":true,"type":"string"},{"metadata":{},"name":"status_metadata","nullable":true,"type":"string"},{"metadata":{},"name":"creator","nullable":true,"type":"string"},{"metadata":{},"name":"created","nullable":true,"type":"timestamp"},{"metadata":{},"name":"creator_type","nullable":true,"type":"string"},{"metadata":{},"name":"updater","nullable":true,"type":"string"},{"metadata":{},"name":"updated","nullable":true,"type":"timestamp"},{"metadata":{},"name":"updater_type","nullable":true,"type":"string"}]}'
-
 spark:
   master_image:
     registry: docker.io
     repository: library/sparkmaster
     tag: '1.0'
     digest: ""
-  worker_image:
+  worker_image: 
     registry: docker.io
     repository: library/sparkclient
     tag: '1.0'

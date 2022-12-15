@@ -89,13 +89,15 @@ services:
     hostname: sparkclient
     ports:
       - '4040:4040'
+      - '40207:40207'
+      - '40208:40208'
     depends_on:
       - sparkmaster
     volumes:
       - spark_packages:/root/.ivy2/jars
       - spark_cache:/root/.ivy2/cache
     env_file:
-      - .env
+      - .env.compose
     networks:
       datapipeline:
         ipv4_address: 172.18.0.8
