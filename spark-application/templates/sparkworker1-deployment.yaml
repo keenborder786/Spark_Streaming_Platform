@@ -36,7 +36,6 @@ spec:
               cpu: {{ .Values.spark.worker1_config.node_resource.limits.cpu }}
           ports:
             - containerPort: 8081
-            # - containerPort: 7337
           tty: true
           volumeMounts:
             - mountPath: /root/.ivy2/jars
