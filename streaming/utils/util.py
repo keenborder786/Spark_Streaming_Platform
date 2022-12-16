@@ -58,9 +58,7 @@ def bindFunction(
 
         print(
             f"===========Processing micro-batch {batch_id} for {table_name} Table===========")
-        if (
-            batch_id % 100 == 0
-        ):  # Compact the files into one file after every 10 batch & delete the files greater than the retention period not needed by delta lake
+        if batch_id % 10 == 0:  # Compact the files into one file after every 10 batch
             delta_lake_builder.optimize().executeCompaction()
 
         # Latest Window Approach

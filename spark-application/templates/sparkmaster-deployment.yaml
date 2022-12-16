@@ -4,6 +4,7 @@ metadata:
   labels:
     app: sparkmaster
   name: sparkmaster
+  namespace: {{ .Values.global.namespace }} 
 spec:
   replicas: 1
   selector:
@@ -19,6 +20,13 @@ spec:
       containers:
         - image: {{printf "%s/%s:%s" .Values.spark.master_image.registry .Values.spark.master_image.repository .Values.spark.master_image.tag}}
           name: sparkmaster
+          resources:
+            requests:
+              memory: {{ .Values.spark.master_config.node_resource.requests.memory }}
+              cpu: {{ .Values.spark.master_config.node_resource.requests.cpu }}
+            limits:
+              memory: {{ .Values.spark.master_config.node_resource.limits.memory }}
+              cpu: {{ .Values.spark.master_config.node_resource.limits.cpu }}
           ports:
             - containerPort: 8080
             - containerPort: 7077

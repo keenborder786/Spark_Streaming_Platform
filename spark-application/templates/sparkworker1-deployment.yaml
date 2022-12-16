@@ -4,6 +4,7 @@ metadata:
   labels:
     app: sparkworker1
   name: sparkworker1
+  namespace: {{ .Values.global.namespace }}  
 spec:
   replicas: 1
   selector:
@@ -19,15 +20,23 @@ spec:
       containers:
         - env:
             - name: MASTER_HOST_NAME
-              value: {{print "spark://" .Values.spark.master_config.ip ":7077"}}
+              value: {{printf "spark://%s:%v" .Values.spark.master_config.ip .Values.spark.master_config.master_port }}
             - name: WORKER_MEMORY
-              value: {{.Values.spark.worker1_config.memory}}
+              value: {{ .Values.spark.worker1_config.spark_node_memory }}
             - name: WORKER_CORES
-              value: {{.Values.spark.worker1_config.cores | quote}}
+              value: {{ .Values.spark.worker1_config.spark_node_cores | quote }}
           image: {{printf "%s/%s:%s" .Values.spark.worker_image.registry .Values.spark.worker_image.repository .Values.spark.worker_image.tag}}
           name: sparkworker1
+          resources:
+            requests:
+              memory: {{ .Values.spark.worker1_config.node_resource.requests.memory }}
+              cpu: {{ .Values.spark.worker1_config.node_resource.requests.cpu }}
+            limits:
+              memory: {{ .Values.spark.worker1_config.node_resource.limits.memory }}
+              cpu: {{ .Values.spark.worker1_config.node_resource.limits.cpu }}
           ports:
             - containerPort: 8081
+            # - containerPort: 7337
           tty: true
           volumeMounts:
             - mountPath: /root/.ivy2/jars

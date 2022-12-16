@@ -82,10 +82,9 @@ if __name__ == "__main__":
             final_schemas[table][f"{table}_write_schema"],
             spark_to_python_types,
         )
-
-        # Updating the table data on delta lake from our new events
-        # func is the batch_processing_function
-        # which we have created by calling bindFunction in above loop.
+        # # Updating the table data on delta lake from our new events
+        # # func is the batch_processing_function
+        # # which we have created by calling bindFunction in above loop.
         hash_map_variables_streams["table_update_" + str(table)].writeStream.foreachBatch(
             func
         ).option("checkpointLocation", f"s3a://{sourceBucket}/{table}/_checkpoint").outputMode(

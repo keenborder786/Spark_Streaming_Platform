@@ -2,6 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: env
+  namespace: {{ .Values.global.namespace }} 
 data:
   KAFKA_CONSUMER_CONFIG: {{.Values.kafka.consumer_config | toPrettyJson}}
   KAFKA_SERVER: {{.Values.kafka.kafkaServer}}

@@ -4,6 +4,7 @@ metadata:
   labels:
     app: sparkclient
   name: sparkclient
+  namespace: {{ .Values.global.namespace }} 
 spec:
   replicas: 1
   selector:
@@ -54,24 +55,40 @@ spec:
                   key: KAFKA_TOPIC_NAME
                   name: env
             - name: MASTER_HOST_NAME
-              value: {{print "spark://" .Values.spark.master_config.ip ":7077"}}
+              value: {{printf "spark://%s:%v" .Values.spark.master_config.ip .Values.spark.master_config.master_port }}
             - name: DRIVER_IP
               valueFrom:
                 fieldRef:
                   apiVersion: "v1"
                   fieldPath: "status.podIP"
             - name: DRIVER_HOST
-              value: 10.97.0.6
+              value: {{.Values.spark.client_config.ip | quote}}
             - name: DRIVER_PORT
-              value: '40207'
+              value: {{.Values.spark.client_config.driver_port | quote}}
             - name: DRIVER_BLOCK_MANAGER_PORT
-              value: '40208'
+              value: {{.Values.spark.client_config.block_manager_port | quote}}
+            - name: EXECUTOR_CORES
+              value: {{.Values.spark.all_workers.executor_cores | quote}}
+            - name: EXECUTOR_MEMORY
+              value: {{.Values.spark.all_workers.executor_memory | quote}}
+            - name: MIN_EXECUTOR_NO
+              value: {{.Values.spark.all_workers.min_executors | quote}}
+            - name: MAX_EXECUTOR_NO
+              value: {{.Values.spark.all_workers.max_executors | quote}}
           image: {{printf "%s/%s:%s" .Values.spark.client_image.registry .Values.spark.client_image.repository .Values.spark.client_image.tag}}
+          resources:
+            requests:
+              memory: {{ .Values.spark.client_config.node_resource.requests.memory }}
+              cpu: {{ .Values.spark.client_config.node_resource.requests.cpu }}
+            limits:
+              memory: {{ .Values.spark.client_config.node_resource.limits.memory }}
+              cpu: {{ .Values.spark.client_config.node_resource.limits.cpu }}
+
           name: sparkclient
           ports:
             - containerPort: 4040
-            - containerPort: 40207
-            - containerPort: 40208
+            - containerPort: {{.Values.spark.client_config.driver_port}}
+            - containerPort: {{.Values.spark.client_config.block_manager_port}}
           volumeMounts:
             - mountPath: /root/.ivy2/jars
               name: spark-packages

@@ -4,11 +4,15 @@ metadata:
   labels:
     app: sparkworker1
   name: sparkworker1-service
+  namespace: {{ .Values.global.namespace }}  
 spec:
   clusterIP: {{.Values.spark.worker1_config.ip}}
   ports:
-    - name: "8081"
-      port: 8081
+    - name: workers-web-ui-port
+      port: {{.Values.spark.all_workers.web_ui_port}}
       targetPort: 8081
+    # - name: workers-executors-external-shuffle-service-port
+    #   port: {{.Values.spark.all_workers.external_shuffle_file_port}}
+    #   targetPort: 7337
   selector:
     app: sparkworker1

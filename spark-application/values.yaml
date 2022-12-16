@@ -1,6 +1,5 @@
-
-
-
+global:
+  namespace: default
 
 kafka:
   kafkaServer: my-release-kafka.default.svc.cluster.local:9092
@@ -29,10 +28,49 @@ spark:
     repository: sparkclient
     tag: '1.0'
     digest: ""
+  
+  client_config:
+    ip: 10.97.0.6
+    web_ui_port: 4040
+    driver_port: 40207
+    block_manager_port: 40208
+    node_resource:
+      requests:
+        memory: 64M
+        cpu: 250m
+      limits:
+        memory: 1.5G
+        cpu: 500m 
+      
   master_config:
     ip: 10.97.0.4
+    web_ui_port: 8080
+    master_port: 7077
+    node_resource:
+      requests:
+        memory: 64M
+        cpu: 250m
+      limits:
+        memory: 1.5G
+        cpu: 500m
+  
+  all_workers:
+    web_ui_port: 8081
+    external_shuffle_file_port: 7337
+    executor_cores: '1'
+    executor_memory: 1500m
+    min_executors: '0'
+    max_executors: '2'
+    
   worker1_config:
     ip: 10.97.0.5
-    cores: '2'
-    memory: 1G
-    
+    spark_node_cores: '2'
+    spark_node_memory: 4g
+    node_resource:
+      requests:
+        memory: 64M
+        cpu: 250m
+      limits:
+        memory: 6G
+        cpu: 2000m
+

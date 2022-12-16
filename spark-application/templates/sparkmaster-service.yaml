@@ -4,14 +4,15 @@ metadata:
   labels:
     app: sparkmaster
   name: sparkmaster-service
+  namespace: {{ .Values.global.namespace }}  
 spec:
   clusterIP: {{.Values.spark.master_config.ip}}
   ports:
-    - name: "8080"
-      port: 8080
+    - name: master-web-ui-port
+      port: {{.Values.spark.master_config.web_ui_port}}
       targetPort: 8080
-    - name: "7077"
-      port: 7077
+    - name: master-port
+      port: {{.Values.spark.master_config.master_port}}
       targetPort: 7077
   selector:
     app: sparkmaster

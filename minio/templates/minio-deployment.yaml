@@ -27,7 +27,7 @@ spec:
               value: user
             - name: MINIO_ROOT_PASSWORD
               value: password
-          image: quay.io/minio/minio:latest
+          image: quay.io/minio/minio:RELEASE.2022-11-26T22-43-32Z.fips
           name: minio
           ports:
             - containerPort: 9000
