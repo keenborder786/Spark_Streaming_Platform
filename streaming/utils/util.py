@@ -1,8 +1,9 @@
 from typing import Callable, Dict, List, Tuple
 
 import pyspark
+from pyspark.sql.functions import col, row_number
 from pyspark.sql.types import BooleanType, FloatType, LongType, StringType, StructField, StructType
-from pyspark.storagelevel import StorageLevel
+from pyspark.sql.window import Window
 
 from streaming.spark_engine import SparkProcessing
 
@@ -42,7 +43,7 @@ def bindFunction(
         Stream processing.
 
         This function updates, deletes and inserts the data from the CDC payload for the given table on delta lake
-        After every 100 batches, we run the optimize command to compact the parquet files created by delta lake.
+        After every 10 batches, we run the optimize command to compact the parquet files created by delta lake.
 
 
         Parameters:
@@ -62,35 +63,39 @@ def bindFunction(
             delta_lake_builder.optimize().executeCompaction()
 
         # Latest Window Approach
-        # latestChangesDF = micro_df.withColumn("row_num", row_number().over(Window.partitionBy("id").orderBy(col("time_event").desc()))).where("row_num == 1")
+        micro_df.cache()
+        latestChangesDF = micro_df.withColumn(
+            "row_num", row_number().over(Window.partitionBy(
+                "id").orderBy(col("time_event").desc()))
+        ).where("row_num == 1")
 
         # Operations
         # Delete the Row: If the latest event is of delete type & customer_id is in the delta table
         # Update the Row: If the latest event is of not delete type & customer id is in the delta table
         # Insert the row: If the latest event is of not delete type & customer id is not in the delta table
 
-        each_row_data = (
-            micro_df.orderBy("id", "time_event")
-            .persist(StorageLevel.MEMORY_AND_DISK_DESER)
-            .collect()
-        )
-        for (
-            row
-        ) in (
-            each_row_data
-        ):  # Iterating over each event and updating the delta lake table. This is needed to keep track of all events.
-            latestChangesDF = spark_processor.spark_session.createDataFrame(
-                [row], schema=cdc_schema
-            )  # Need to convert each rowback to dataframe type
+        # each_row_data = (
+        #     micro_df.orderBy("id", "time_event")
+        #     .persist(StorageLevel.MEMORY_AND_DISK_DESER)
+        #     .collect()
+        # )
+        # for (
+        #     row
+        # ) in (
+        #     each_row_data
+        # ):  # Iterating over each event and updating the delta lake table. This is needed to keep track of all events.
+        #     latestChangesDF = spark_processor.spark_session.createDataFrame(
+        #         [row], schema=cdc_schema
+        #     )  # Need to convert each rowback to dataframe type
 
-            delta_lake_builder.alias("main_table").merge(
-                latestChangesDF.alias(
-                    "update_table"), "main_table.id = update_table.id"
-            ).whenMatchedDelete(condition="update_table.op = 'd'").whenMatchedUpdate(
-                condition="update_table.op != 'd'", set=fields_map
-            ).whenNotMatchedInsert(
-                condition="update_table.op != 'd'", values=fields_map
-            ).execute()
+        delta_lake_builder.alias("main_table").merge(
+            latestChangesDF.alias(
+                "update_table"), "main_table.id = update_table.id"
+        ).whenMatchedDelete(condition="update_table.op = 'd'").whenMatchedUpdate(
+            condition="update_table.op != 'd'", set=fields_map
+        ).whenNotMatchedInsert(
+            condition="update_table.op != 'd'", values=fields_map
+        ).execute()
 
     func.__name__ = table_name
     return func

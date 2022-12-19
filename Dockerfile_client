@@ -9,6 +9,7 @@ ENV EXECUTOR_CORES=''
 ENV EXECUTOR_MEMORY=''
 ENV MIN_EXECUTOR_NO=''
 ENV MAX_EXECUTOR_NO=''
+ENV SHUFFLE_PARTITION=''
 ## Setting up my code
 COPY streaming/ /opt/poc_kafka_delta/streaming/
 COPY main.py /opt/poc_kafka_delta
@@ -27,5 +28,6 @@ CMD $SPARK_HOME/bin/spark-submit --packages org.apache.spark:spark-sql-kafka-0-1
     --conf spark.dynamicAllocation.minExecutors=$MIN_EXECUTOR_NO \
     --conf spark.dynamicAllocation.maxExecutors=$MAX_EXECUTOR_NO \
     --conf spark.driver.blockManager.port=$DRIVER_BLOCK_MANAGER_PORT \
+    --conf spark.sql.shuffle.partitions=$SHUFFLE_PARTITION \
     --conf spark.pyspark.python=/opt/conda/envs/spark_streaming/bin/python \
     /opt/poc_kafka_delta/main.py

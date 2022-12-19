@@ -13,6 +13,7 @@ BOOTSTRAP_SERVER = [kafka_server]
 TOPICNAME = "cdc_test_topics"
 PRODUCER = KafkaProducer(bootstrap_servers=BOOTSTRAP_SERVER)
 NUMBER_OF_PAYLOAD = 50
+TOTAL_ITERATION = 1
 
 
 def static_simulation() -> List[str]:
@@ -527,7 +528,7 @@ def random_simulation(number_of_payloads: int) -> List[str]:
     random_updater = ["Mohammad", "Oscar", "Carl"]
     random_updater_type = ["Large", "Small", "Medium"]
 
-    for _ in range(number_of_payloads):
+    for i in range(number_of_payloads):
         dt = datetime.now()
         current_operation = operations[random.randint(0, len(operations) - 1)]
 
@@ -594,7 +595,7 @@ def random_simulation(number_of_payloads: int) -> List[str]:
                     after_payload = None
                     before_payload["id"]["value"] = random_id_to_update_delete
 
-        print("*** Payload was generated ***")
+        print(f"*** Payload {i+1} was generated ***")
         final_payload = {
             "payload": {
                 "before": before_payload,
@@ -620,14 +621,18 @@ def random_simulation(number_of_payloads: int) -> List[str]:
         }
         json_string = json.dumps(final_payload)
         json_string = rf"""{json_string}"""
-
-        print(json_string)
         payloads.append(json_string)
     return payloads
 
 
 if __name__ == "__main__":
-    payloads = random_simulation(NUMBER_OF_PAYLOAD)
-    for payload in payloads:
-        PRODUCER.send("cdc_test_topics", payload.encode(
-            "utf-8")).get(timeout=10)
+    num_iteration = 1
+
+    while num_iteration <= TOTAL_ITERATION:
+        payloads = random_simulation(NUMBER_OF_PAYLOAD)
+        for payload in payloads:
+            PRODUCER.send("cdc_test_topics", payload.encode(
+                "utf-8")).get(timeout=10)
+
+        num_iteration += 1
+        print(f"*** Number of Iterations: {num_iteration} ***")

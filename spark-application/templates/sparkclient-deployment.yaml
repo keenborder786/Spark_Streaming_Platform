@@ -75,6 +75,8 @@ spec:
               value: {{.Values.spark.all_workers.min_executors | quote}}
             - name: MAX_EXECUTOR_NO
               value: {{.Values.spark.all_workers.max_executors | quote}}
+            - name: SHUFFLE_PARTITION
+              value: {{mul .Values.spark.all_workers.max_executors .Values.spark.all_workers.executor_cores 2 | quote }}
           image: {{printf "%s/%s:%s" .Values.spark.client_image.registry .Values.spark.client_image.repository .Values.spark.client_image.tag}}
           resources:
             requests:
