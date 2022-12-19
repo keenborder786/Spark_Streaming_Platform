@@ -1,4 +1,3 @@
-import pyspark
 from dotenv import find_dotenv, load_dotenv
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
