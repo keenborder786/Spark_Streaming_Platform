@@ -49,11 +49,6 @@ spec:
                 configMapKeyRef:
                   key: S3_SOURCE_BUCKET
                   name: env
-            - name: KAFKA_TOPIC_NAME
-              valueFrom:
-                configMapKeyRef:
-                  key: KAFKA_TOPIC_NAME
-                  name: env
             - name: MASTER_HOST_NAME
               value: {{printf "spark://%s:%v" .Values.spark.master_config.ip .Values.spark.master_config.master_port }}
             - name: DRIVER_IP
