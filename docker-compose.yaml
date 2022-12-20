@@ -72,6 +72,7 @@ services:
     environment:
       MASTER_HOST_NAME: spark://172.18.0.6:7077
       WORKER_MEMORY: 1G
+      WORKER_CORES: "2"
     tty: true
     ports:
       - '8081:8081'
@@ -101,8 +102,6 @@ services:
     networks:
       datapipeline:
         ipv4_address: 172.18.0.8
-        
-
 
 secrets:
   minio_user:
@@ -111,14 +110,14 @@ secrets:
     file: ./secrets/minio_password.txt
 
 volumes:
-  minio_storage:  {}
+  minio_storage: {}
   spark_packages: {}
-  spark_cache:    {}
+  spark_cache: {}
 
 networks:
-    datapipeline:
-        driver: bridge
-        ipam:
-            driver: default
-            config:
-                - subnet: "172.18.0.0/16"
+  datapipeline:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.18.0.0/16"
