@@ -103,7 +103,7 @@ If you want to test run the spark job then follow the given step:
 | `spark.worker_image.digest`      | Spark Worker Image digest                                      | `""`                 |
 | `spark.client_image.registry`    | Spark Client Image registry                                    | `docker.io`          |
 | `spark.client_image.repository`  | Spark Client Image repository                                  | `library/sparkmaster`|
-| `spark.client_image.tag`         | Spark Client Image tag (immutable tags are recommended)        | `1.0`                |
+| `spark.client_image.tag`         | Spark Client Image tag (immutable tags are recommended)        | `1.2`                |
 | `spark.client_image.digest`      | Spark Client Image digest                                      | `""`                 |
 
 
@@ -112,26 +112,26 @@ If you want to test run the spark job then follow the given step:
 #### Client Config
 | Name                            | Description                                                                                      |Value       |
 | ------------------------        | -----------------------------------                                                              |------------|
-| `spark.client_config.ip`         | IP Address for Master Service                                                                   | `10.97.0.4`|
+| `spark.client_config.ip`         | IP Address for Master Service                                                                   | `10.97.0.6`|
 | `spark.client_config.web_ui_port`    |  The service port to listen for the client's web ui port                                    |`4040`      |
 | `spark.client_config.driver_port`    |  The service port to listen for the driver's  port                                          |`40207`     |
 | `spark.client_config.block_manager_port`    |  The service port to listen for the block manager  port                              |`40208`     |
 | `spark.client_config.node_resource.requests.memory`  | Memory needed to be present on the node for the client pod to start         | `64M`      |
 | `spark.client_config.node_resource.requests.cpu`     | CPU needed to be present on the node for the client pod to start            | `250m`     |
-| `spark.client_config.node_resource.limits.memory`    | Maximum amount of memory that can be used by the hosting node of client     | `6G`       |
-| `spark.client_config.node_resource.requests.cpu`     | Maximum amount of cpu that can be used by the hosting node of client        | `2000m`    |
+| `spark.client_config.node_resource.limits.memory`    | Maximum amount of memory that can be used by the hosting node of client     | `1.5G`     |
+| `spark.client_config.node_resource.requests.cpu`     | Maximum amount of cpu that can be used by the hosting node of client        | `500m`     |
 
 
 #### Master Config
 | Name                            | Description                                                                                      |Value       |
 | ------------------------        | -----------------------------------                                                              |------------|
 | `spark.master_config.ip`         | IP Address for Master Service                                                                   | `10.97.0.4`|
-| `spark.master_config.web_ui_port`  |  The service port to listen for the master's web ui port                                        |`9001`      |
-| `spark.all_workers.master_port`    |  The service port to listen for the master's  port                                              |`7077`      |
+| `spark.master_config.web_ui_port`  |  The service port to listen for the master's web ui port                                      |`9001`        |
+| `spark.master_config.master_port`    |  The service port to listen for the master's  port                                          |`7077`      |
 | `spark.master_config.node_resource.requests.memory`  | Memory needed to be present on the node for the master pod to start         | `64M`      |
 | `spark.master_config.node_resource.requests.cpu`     | CPU needed to be present on the node for the master pod to start            | `250m`     |
-| `spark.master_config.node_resource.limits.memory`    | Maximum amount of memory that can be used by the hosting node of master     | `6G`       |
-| `spark.master_config.node_resource.requests.cpu`     | Maximum amount of cpu that can be used by the hosting node of master        | `2000m`    |
+| `spark.master_config.node_resource.limits.memory`    | Maximum amount of memory that can be used by the hosting node of master     | `1.5G`     |
+| `spark.master_config.node_resource.requests.cpu`     | Maximum amount of cpu that can be used by the hosting node of master        | `500m`    |
 
 #### All-Workers Config
 | Name                               | Description                                               | Value               |
@@ -148,11 +148,8 @@ If you want to test run the spark job then follow the given step:
 | ------------------------          | -----------------------------------                                                            | ----------------|
 | `spark.worker1_config.ip`         | IP Address for Worker 1 Service                                                                | `10.97.0.5`|
 | `spark.worker1_config.cores`      | Cores for Worker 1                                                                             | `2`|
-| `spark.worker1_config.memory`     | Memory for Worker 1                                                                            | `1G`|
+| `spark.worker1_config.memory`     | Memory for Worker 1                                                                            | `4g`|
 | `spark.worker1_config.node_resource.requests.memory` | Memory needed to be present on the node for the worker1 pod to start        | `64M` |
 | `spark.worker1_config.node_resource.requests.cpu`     | CPU needed to be present on the node for the worker1 pod to start          | `250m`|
 | `spark.worker1_config.node_resource.limits.memory`      | Maximum amount of memory that can be used by the hosting node of woker1  | `6G` |
 | `spark.worker1_config.node_resource.requests.cpu`     | Maximum amount of cpu that can be used by the hosting node of woker1       | `2000m`|
-
-
-
