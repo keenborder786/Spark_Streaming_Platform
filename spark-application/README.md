@@ -126,7 +126,7 @@ If you want to test run the spark job then follow the given step:
 | Name                            | Description                                                                                      |Value       |
 | ------------------------        | -----------------------------------                                                              |------------|
 | `spark.master_config.ip`         | IP Address for Master Service                                                                   | `10.97.0.4`|
-| `spark.master_config.web_ui_port`  |  The service port to listen for the master's web ui port                                        |`8080`      |
+| `spark.master_config.web_ui_port`  |  The service port to listen for the master's web ui port                                        |`9001`      |
 | `spark.all_workers.master_port`    |  The service port to listen for the master's  port                                              |`7077`      |
 | `spark.master_config.node_resource.requests.memory`  | Memory needed to be present on the node for the master pod to start         | `64M`      |
 | `spark.master_config.node_resource.requests.cpu`     | CPU needed to be present on the node for the master pod to start            | `250m`     |
