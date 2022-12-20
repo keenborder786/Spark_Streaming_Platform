@@ -7,6 +7,7 @@ loading from all env variables
 
 from streaming.config import (
     debeziumsourceschema,
+    delta_lake_schemas,
     delta_lake_tables_config,
     final_schemas,
     hadoop_config,
@@ -14,13 +15,14 @@ from streaming.config import (
     kafka_server,
     sourceBucket,
     spark_to_python_types,
-    topic_name,
+    topic_names,
 )
 from streaming.deltalake_engine import DeltaLakeInteraction
 from streaming.spark_engine import SparkProcessing
 from streaming.utils import bindFunction
 
 if __name__ == "__main__":
+
     # Setting up the spark session
     # Spark Session for the streaming jobs.
     spark_processor = SparkProcessing("kafka_delta", hadoop_config)
@@ -29,7 +31,6 @@ if __name__ == "__main__":
     # This list will consist of created batch_processing function
     # for each of tables and the table names.
     all_batch_processing_funcitons = []
-
     for table, _ in final_schemas.items():  # Iterate over each table.
         # Create the desired table if it does not exists
         table_deltalake_instance = DeltaLakeInteraction(
@@ -60,7 +61,7 @@ if __name__ == "__main__":
 
         # Reading kafka stream
         hash_map_variables_streams["df_" + str(table)] = spark_processor.read_kafka_stream(
-            kafka_server, topic_name, "latest", kafka_config
+            kafka_server, topic_names[table], "latest", kafka_config
         )
 
         # Processing the raw_events coming from kafka.
@@ -69,11 +70,6 @@ if __name__ == "__main__":
             hash_map_variables_streams["df_" +
                                        str(table)], debeziumsourceschema
         )
-
-        # Filtering out the events that we need for the table
-        hash_map_variables_streams["raw_events_" + str(table)] = hash_map_variables_streams[
-            "raw_events_" + str(table)
-        ].filter((hash_map_variables_streams["raw_events_" + str(table)].source.table == table))
 
         # Processing the table data from payload.
         hash_map_variables_streams["table_update_" + str(table)] = spark_processor.table_processing(
@@ -85,9 +81,11 @@ if __name__ == "__main__":
         # # Updating the table data on delta lake from our new events
         # # func is the batch_processing_function
         # # which we have created by calling bindFunction in above loop.
-        hash_map_variables_streams["table_update_" + str(table)].writeStream.foreachBatch(
-            func
-        ).option("checkpointLocation", f"s3a://{sourceBucket}/{table}/_checkpoint").outputMode(
+        hash_map_variables_streams["table_update_" + str(table)].writeStream.queryName(
+            f"streaming_{table}_cdc"
+        ).foreachBatch(func).option(
+            "checkpointLocation", f"s3a://{sourceBucket}/{table}/_checkpoint"
+        ).outputMode(
             "update"
         ).start()
 

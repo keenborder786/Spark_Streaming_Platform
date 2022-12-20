@@ -3,7 +3,6 @@ global:
 
 kafka:
   kafkaServer: my-release-kafka.default.svc.cluster.local:9092
-  topic_name: cdc_test_topics
   consumer_config: '{"failOnDataLoss":"false" , "minOffsetsPerTrigger":30}'
 
 s3:
@@ -26,7 +25,7 @@ spark:
   client_image:
     registry: quay.io/oknah
     repository: sparkclient
-    tag: "1.1"
+    tag: "1.2"
     digest: ""
 
   client_config:
@@ -44,7 +43,7 @@ spark:
 
   master_config:
     ip: 10.97.0.4
-    web_ui_port: 8080
+    web_ui_port: 9001
     master_port: 7077
     node_resource:
       requests:
