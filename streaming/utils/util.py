@@ -74,20 +74,6 @@ def bindFunction(
         # Update the Row: If the latest event is of not delete type & customer id is in the delta table
         # Insert the row: If the latest event is of not delete type & customer id is not in the delta table
 
-        # each_row_data = (
-        #     micro_df.orderBy("id", "time_event")
-        #     .persist(StorageLevel.MEMORY_AND_DISK_DESER)
-        #     .collect()
-        # )
-        # for (
-        #     row
-        # ) in (
-        #     each_row_data
-        # ):  # Iterating over each event and updating the delta lake table. This is needed to keep track of all events.
-        #     latestChangesDF = spark_processor.spark_session.createDataFrame(
-        #         [row], schema=cdc_schema
-        #     )  # Need to convert each rowback to dataframe type
-
         delta_lake_builder.alias("main_table").merge(
             latestChangesDF.alias(
                 "update_table"), "main_table.id = update_table.id"

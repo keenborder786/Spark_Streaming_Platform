@@ -28,7 +28,7 @@ s3endPointLoc = os.environ["S3_END_POINT"]
 sourceBucket = os.environ["S3_SOURCE_BUCKET"]
 kafka_server = os.environ["KAFKA_SERVER"]
 kafka_config = json.loads(os.environ["KAFKA_CONSUMER_CONFIG"])
-topic_name = os.environ["KAFKA_TOPIC_NAME"]
+topic_names = json.loads(os.environ["KAFKA_TABLE_TOPICS"])
 delta_lake_tables_config = json.loads(os.environ["DELTA_LAKE_TABLE_CONFIG"])[
     "Delta_Lake_Tables"]
 delta_lake_schemas = json.loads(os.environ["DELTA_LAKE_TABLE_SCHEMAS"])[
