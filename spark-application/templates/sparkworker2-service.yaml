@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: sparkworker2
+  name: sparkworker2-service
+  namespace: {{ .Values.global.namespace }}  
+spec:
+  clusterIP: {{.Values.spark.worker2_config.ip}}
+  ports:
+    - name: workers-web-ui-port
+      port: {{.Values.spark.all_workers.web_ui_port}}
+      targetPort: 8081
+  selector:
+    app: sparkworker2
