@@ -2,7 +2,7 @@ version: '3'
 
 services:
   zookeeper:
-    image: 'bitnami/zookeeper:latest'
+    image: 'docker.io/bitnami/zookeeper@sha256:f99a9c73636c28e167d5c2465dd9773ac3662d15ff5bcc3e56e24b80e6546d68'
     container_name: zookeeper
     hostname: zookeeper
     ports:
@@ -13,7 +13,7 @@ services:
       datapipeline:
         ipv4_address: 172.18.0.3
   kafka:
-    image: 'bitnami/kafka:latest'
+    image: 'docker.io/bitnami/kafka@sha256:b0c23c3faa95bb12aaec10ba300b83049f31424ee0df1cdc14b4fde016309072'
     container_name: kafka
     hostname: kafka
     ports:
@@ -30,7 +30,7 @@ services:
       datapipeline:
         ipv4_address: 172.18.0.4
   minio:
-    image: quay.io/minio/minio
+    image: quay.io/minio/minio:RELEASE.2022-11-26T22-43-32Z.fips
     container_name: minio
     hostname: minio
     ports:

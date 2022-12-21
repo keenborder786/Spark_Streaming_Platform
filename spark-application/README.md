@@ -138,18 +138,18 @@ If you want to test run the spark job then follow the given step:
 | ------------------------           | -----------------------------------                       | --------------------|
 | `spark.all_workers.web_ui_port`    |  The service port to listen for the worker web ui port    | `8081`              |
 | `spark.all_workers.executor_cores` | The number of executor cores to be utilized per worker    | `1`                 |
-| `spark.all_workers.executor_memory`| The amount of executor memory to be utilized per worker   | `1500m`             |
+| `spark.all_workers.executor_memory`| The amount of executor memory to be utilized per worker   | `2000m`             |
 | `spark.all_workers.min_executors`  | The minimum number of executor on each worker             | `0`                 |
-| `spark.all_workers.max_executors`  | The maximum number of executor on each worker             | `2`                 |
+| `spark.all_workers.max_executors`  | The maximum number of executor on each worker             | `1`                 |
 
 
-#### Worker1 Config
+#### Worker(n) Config (n = 1 to number of worker pods)
 | Name                              | Description                                                                                    | Value           |
 | ------------------------          | -----------------------------------                                                            | ----------------|
-| `spark.worker1_config.ip`         | IP Address for Worker 1 Service                                                                | `10.97.0.5`|
-| `spark.worker1_config.cores`      | Cores for Worker 1                                                                             | `2`|
-| `spark.worker1_config.memory`     | Memory for Worker 1                                                                            | `4g`|
-| `spark.worker1_config.node_resource.requests.memory` | Memory needed to be present on the node for the worker1 pod to start        | `64M` |
-| `spark.worker1_config.node_resource.requests.cpu`     | CPU needed to be present on the node for the worker1 pod to start          | `250m`|
-| `spark.worker1_config.node_resource.limits.memory`      | Maximum amount of memory that can be used by the hosting node of woker1  | `6G` |
-| `spark.worker1_config.node_resource.requests.cpu`     | Maximum amount of cpu that can be used by the hosting node of woker1       | `2000m`|
+| `spark.worker(n)_config.ip`         | IP Address for Worker 1 Service                                                                | `10.97.0.5`|
+| `spark.worker(n)_config.cores`      | Cores for Worker 1                                                                             | `1`|
+| `spark.worker(n)_config.memory`     | Memory for Worker 1                                                                            | `2g`|
+| `spark.worker(n)_config.node_resource.requests.memory` | Memory needed to be present on the node for the worker1 pod to start        | `64M` |
+| `spark.worker(n)_config.node_resource.requests.cpu`     | CPU needed to be present on the node for the worker1 pod to start          | `250m`|
+| `spark.worker(n)_config.node_resource.limits.memory`      | Maximum amount of memory that can be used by the hosting node of woker1  | `6G` |
+| `spark.worker(n)_config.node_resource.requests.cpu`     | Maximum amount of cpu that can be used by the hosting node of woker1       | `2000m`|
