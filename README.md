@@ -1,5 +1,9 @@
 # poc_kafka_delta
 
+## Architecture of Spark Cluster:
+
+![Spark-Architecture](https://github.com/keenborder786/poc_kafka_delta/blob/main/diagrams/Spark_Architecture.drawio)
+
 ## How to test run the pipeline?
 
 ### Method-1: Docker Compose
