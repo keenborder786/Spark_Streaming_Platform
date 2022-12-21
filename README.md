@@ -2,7 +2,7 @@
 
 ## Architecture of Spark Cluster:
 
-![Spark-Architecture](https://github.com/keenborder786/poc_kafka_delta/blob/main/diagrams/Spark_Architecture.drawio.svg)
+![Spark-Architecture](https://github.com/keenborder786/poc_kafka_delta/blob/main/diagrams/Spark_Architecture.drawio.png)
 
 ## How to test run the pipeline?
 
