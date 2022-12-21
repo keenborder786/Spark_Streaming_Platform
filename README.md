@@ -36,9 +36,10 @@
 <p> Create two files named minio_user.txt and minio_password.txt , store them in a folder called secrets </p>
 
 
-#### Step:1 Set following Config Variables and put in an .env.compose file.
+#### Step:1 Set following Config Variables and put in an .env.compose file (If already not created)
 
 ```console
+
 S3_USER=user
 S3_PASSWORD=password
 S3_END_POINT=172.18.0.5:9000
@@ -63,18 +64,7 @@ SHUFFLE_PARTITION="2"
 <p> KafkaConsumerConfig options can be seen from: https://spark.apache.org/docs/2.1.0/structured-streaming-kafka-integration.html </p>
 
 
-#### Step:2 Build the docker images for sparkbase,sparkmaster,sparkworker & sparkclient
-
-```console
-
-docker build -f Dockerfile_base --tag sparkbase:1.0 . \
-docker build -f Dockerfile_master --tag sparkmaster:1.0 . \
-docker build -f Dockerfile_worker --tag sparkworker:1.0 . \
-docker build -f Dockerfile_client --tag sparkclient:1.0 .
-
-```
-
-#### Step:3 Start the app through docker compose file
+#### Step:2 Start the app through docker compose file
 
 ```console
 
@@ -83,7 +73,7 @@ docker-compose up
 ```
 <p> NOTE: The setting up of services might take some time for the first time since spark need to download the packages from internet. However, next time it will store the packages on the mounted volumes </p>
 
-#### Step:4 Run simulate_kafka.py
+#### Step:3 Run simulate_kafka.py
 
 ```console
 
