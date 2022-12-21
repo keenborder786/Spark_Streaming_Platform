@@ -53,9 +53,8 @@ If you want to test run the spark job then follow the given step:
 - Step-1: Install [Helm](https://helm.sh/docs/intro/install/)  
 - Step-2: Install kafka cluster chart by [bitnami](https://github.com/bitnami/charts/tree/main/bitnami/kafka) and deploy on minikube with default values.
 - Step-3: Set up dev minio chart provided [here](https://github.com/keenborder786/poc_kafka_delta/tree/main/minio) and deploy on minikube.
-- Step-4: Build all of the images for all the docker files from [here](https://github.com/keenborder786/poc_kafka_delta/tree/main)
-- Step-5: Now run the spark helm chart and deploy on minikube with default values.
-- Step-6: Open the shell of sparkclient pod running on minikube and run the following script ***/opt/poc_kafka_delta/simulate_kafka.py*** to test run a job for customer table.
+- Step-4: Now run the spark helm chart and deploy on minikube with default values.
+- Step-5: Open the shell of sparkclient pod running on minikube and run the following script ***/opt/poc_kafka_delta/simulate_kafka.py*** to test run a job.
 
 ## Parameters
 
