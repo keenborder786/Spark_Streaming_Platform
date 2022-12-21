@@ -1,33 +1,10 @@
 # poc_kafka_delta
 
-## Architecture of Spark Cluster:
+# Architecture of Spark Cluster:
 
 ![Spark-Architecture](https://github.com/keenborder786/poc_kafka_delta/blob/main/diagrams/Spark_Architecture.drawio.png)
 
 ## How to test run the pipeline?
-
-
-## How to set up dev environment for contributing?
-
-  - Install [mamba](https://github.com/conda-forge/miniforge#mambaforge) for conda package management on your local machine. More [Instruction](https://mamba.readthedocs.io/en/latest/installation.html).
-  - Once mamba is set up, clone the repo and run the following commands in the root directory: 
-  ```console
-  
-  mamba env create -f environment.yml
-  conda activate spark_streaming
-
-  ```
-  - Now you can start developing in the repo.
-  - Once you are done with the changes, run the following command:
-  
-  ```console
-
-  pre-commit install
-
-  ```
-  - This will install a pre-commit github hook to format your code according to pep 8 standards. For the packages we are using to format the code refer   to .pre-commit-config.yaml
-   - You can now commit your code.
-
 
 ### Method-1: Docker Compose
 
@@ -91,3 +68,24 @@ python simulate_kafka.py -p 50 -i 150
 
 ### Method-2: Helm Chart [Click Here](https://github.com/keenborder786/poc_kafka_delta/tree/main/spark-application)
 
+
+## How to set up dev environment for contributing?
+
+  - Install [mamba](https://github.com/conda-forge/miniforge#mambaforge) for conda package management on your local machine. More [Instruction](https://mamba.readthedocs.io/en/latest/installation.html).
+  - Once mamba is set up, clone the repo and run the following commands in the root directory: 
+  ```console
+  
+  mamba env create -f environment.yml
+  conda activate spark_streaming
+
+  ```
+  - Now you can start developing in the repo.
+  - Once you are done with the changes, run the following command:
+  
+  ```console
+
+  pre-commit install
+
+  ```
+  - This will install a pre-commit github hook to format your code according to pep 8 standards. For the packages we are using to format the code refer   to .pre-commit-config.yaml
+   - You can now commit your code.
