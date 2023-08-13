@@ -1,4 +1,4 @@
-# poc_kafka_delta
+# Spark_Streaming_Platform
 
 # Architecture of Spark Cluster:
 
